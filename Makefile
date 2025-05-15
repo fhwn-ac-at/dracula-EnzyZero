@@ -1,7 +1,7 @@
-CC = clang
-CFLAGS += -Wall -Wextra -Werror --std=c17
+CC = clang++
+CXXFLAGS += -Wall -Wextra -Werror --std=c++23 -ggdb
 
-pfusch: pfusch.c
+pfusch: pfusch.cpp
 
 clean:
 	rm -f pfusch *.o
