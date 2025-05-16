@@ -54,7 +54,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 else() # Release
 
-    add_executable(dracula main.cpp) 
+    add_executable(dracula ${SOURCES}) 
     message(STATUS "Tests disabled")
 
     target_link_libraries(dracula PRIVATE
