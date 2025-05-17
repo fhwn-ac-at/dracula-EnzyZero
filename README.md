@@ -30,6 +30,14 @@ cmake --preset conan-release
 cmake --build --preset conan-release
 ```
 
+If you run into an issue with ncurses/running the binary outputting something like `Error opening terminal: [...]`, try installing the `ncurses-term` database and setting some env-variables:
+
+```sh
+apt install ncurses-term
+
+export TERMINFO=/usr/share/terminfo
+```
+
 # Model
 
 The picture below shows the rough model of how the classes are implemented to work with each other.
