@@ -4,40 +4,131 @@
 #include <utility>
 #include <memory>
 #include <array>
+#include <type_traits>
 
 #include <spdlog/sinks/base_sink.h>
 #include <spdlog/details/null_mutex.h>
 #include <spdlog/pattern_formatter.h>
 #include <spdlog/formatter.h>
 
-namespace ncurse {
 #include <ncurses.h>
-}
 
-class Ncurses  {
+
+namespace ncurses {
+
+
+class window_base {
+
+public:
+    window_base(WINDOW* win)
+    :   width_( getmaxx(win)-2 ),
+        window_( derwin(win, getmaxy(win) - 2, width_, 1, 1) )
+    {
+        // make window scrollable
+        scrollok(window_, true);
+    } 
+
+    template <typename... Args>
+    void print(const std::string_view format, Args&&... args) {
+        
+        std::string msg = fmt::format(format, std::forward<Args>(args)... ); 
+        waddstr(window_, msg.c_str());
+    }
+
+    template <typename... Args>
+    void sprint(const std::string_view format, Args&&... args) {
+        
+        std::string msg = fmt::format(format, std::forward<Args>(args)... ); 
+        waddnstr(window_, msg.c_str(), width_); // cut off long outputs
+    }
+
+    void refresh() { wrefresh(window_); }
+
+    virtual ~window_base() = default;
+
+private:
+    const int width_;
+    WINDOW* window_;
+};
+
+template <typename T>
+concept DerivedWindow = std::is_base_of_v<window_base, T>;
+
+class sink_st : public spdlog::sinks::base_sink<spdlog::details::null_mutex>  {
 public:
 
-    /**
-     * Custom sink for spdlog to write into specific window
-     */
-    class sink_st;
-
-    Ncurses()
+    sink_st(WINDOW* win)
+    :   width_( getmaxx(win)-2 ),
+        window_( derwin(win, getmaxy(win) -2, width_ , 1, 1) )
     {
-        ncurse::initscr();
-        ncurse::curs_set(0); 
-        ncurse::start_color();
-        ncurse::refresh(); // for some reason, not refreshing at start breaks stuff later :(
+        // make window scrollable
+        scrollok(window_, true);
+    }
+
+protected:
+
+    void sink_it_(const spdlog::details::log_msg& msg) override {
+
+        auto [lvl_name, lvl_id] = level_what_(msg.level);
+
+        // colour the level
+        wattron(window_, COLOR_PAIR( lvl_id ) );
+        waddstr(window_, lvl_name.data() );
+        wattroff(window_, COLOR_PAIR( lvl_id ));
+
+        // print payload
+        // waddnstr truncates strings that are too long
+        waddnstr(window_, msg.payload.data(), width_ - lvl_name.length() - 1 );
+        wprintw(window_, "\n");
+        wrefresh(window_);
+    }
+
+    void flush_() override { wrefresh(window_); }
+
+private: 
+
+    const int width_;
+    WINDOW* window_;
+
+    static constexpr auto level_what_(const spdlog::level::level_enum level) -> std::pair<std::string_view, int> {
+
+        using namespace spdlog::level;
+
+        switch (level)
+        {
+            case spdlog::level::trace:    return {"[TRACE]", 1};
+            case debug:                   return {"[DEBUG]", 2};
+            case info:                    return {"[INFO]",  3};
+            case warn:                    return {"[WARN]",  4};
+            case err:                     return {"[ERROR]", 5};
+            case critical:                return {"[CRIT]",  6};
+            case off:                     return {"[OFF]",   7};
+            default:                      return {"[IDK]",   8};
+        }
+
+        std::unreachable();
+    };
+};
+
+class ncurses  {
+public:
+
+    ncurses()
+    {
+        initscr();
+        curs_set(0); 
+        start_color();
+        refresh(); // for some reason, not refreshing at start breaks stuff later :(
         // cbreak();
         // noecho()
         // keypad(stdscr, TRUE)
+
+        init_globals_();
     }
 
     void add_win(const std::string name, int height, int width, int start_y, int start_x) { 
 
-        using namespace ncurse;
-
-        WINDOW* win = ncurse::newwin(height, width, start_y, start_x);
+        WINDOW* win = newwin(height, width, start_y, start_x);
         wborder(win, 
             ACS_VLINE, ACS_VLINE,     // Left, Right: vertical bars
             ACS_HLINE, ACS_HLINE,     // Top, Bottom: horizontal bars
@@ -54,96 +145,52 @@ public:
     }
 
     auto sink_for_win(const std::string name) -> std::shared_ptr<sink_st> {
-
         return std::make_shared<sink_st>( windows_.at(name) );
+    }
+
+    template <DerivedWindow T>
+    auto base_for_win(const std::string name) -> std::unique_ptr<window_base> {
+        return std::make_unique<T>( windows_.at(name) );
     }
 
     void del_win(const std::string name)
     {
-        ncurse::delwin(windows_.at(std::string(name)));
+        delwin(windows_.at(std::string(name)));
         windows_.erase(name);
     }
 
-    auto get_dimensions() const noexcept -> std::pair<int, int> { return {ncurse::LINES, ncurse::COLS}; }
+    auto get_dimensions() const noexcept -> std::pair<int, int> { return {LINES, COLS}; }
 
-    ~Ncurses() { 
+    ~ncurses() { 
 
         // destroy all windows
         for (auto window : windows_)
-            ncurse::delwin(window.second);
+            delwin(window.second);
 
-        ncurse::endwin();
+        endwin();
     }
 
 private:
-    std::map<std::string, ncurse::WINDOW*> windows_;
-};
+    std::map<std::string, WINDOW*> windows_;
 
+    static void init_globals_() {
+        static bool initialised = false;
 
-class Ncurses::sink_st : public spdlog::sinks::base_sink<spdlog::details::null_mutex>  {
-public:
-
-    sink_st(ncurse::WINDOW* win)
-    :   width_( getmaxx(win)-2 ),
-        window_( ncurse::derwin(win, getmaxy(win) -2, width_ , 1, 1) )
-    {
-        // make window scrollable
-        ncurse::scrollok(window_, true);
-
-        // define colors for spdlog::levels enum
-        ncurse::init_pair(1, COLOR_CYAN, COLOR_BLACK);    // trace
-        ncurse::init_pair(2, COLOR_MAGENTA, COLOR_BLACK); // debug
-        ncurse::init_pair(3, COLOR_GREEN, COLOR_BLACK);   // info
-        ncurse::init_pair(4, COLOR_YELLOW, COLOR_BLACK);  // warn
-        ncurse::init_pair(5, COLOR_RED, COLOR_BLACK);     // error
-        ncurse::init_pair(6, COLOR_WHITE, COLOR_RED);     // critical
-        ncurse::init_pair(7, COLOR_BLUE, COLOR_BLACK);    // off
-        ncurse::init_pair(8, COLOR_WHITE, COLOR_BLACK);   // n_levels (idk)
-    }
-
-protected:
-
-    void sink_it_(const spdlog::details::log_msg& msg) override {
-
-        using namespace ncurse;
-
-        auto [lvl_name, lvl_id] = level_what_(msg.level);
-
-        // colour the level
-        wattron(window_, COLOR_PAIR( lvl_id ) );
-        waddstr(window_, lvl_name.data() );
-        wattroff(window_, COLOR_PAIR( lvl_id ));
-
-        // print payload
-        // waddnstr truncates strings that are too long
-        waddnstr(window_, msg.payload.data(), width_ - lvl_name.length() - 1 );
-        wprintw(window_, "\n");
-        wrefresh(window_);
-    }
-
-    void flush_() override { ncurse::wrefresh(window_); }
-
-private: 
-
-    const int width_;
-    ncurse::WINDOW* window_;
-
-    static constexpr auto level_what_(const spdlog::level::level_enum level) -> std::pair<std::string_view, int> {
-
-        using namespace spdlog::level;
-
-        switch (level)
+        if (initialised)
         {
-            case trace:    return {"[TRACE]", 1};
-            case debug:    return {"[DEBUG]", 2};
-            case info:     return {"[INFO]",  3};
-            case warn:     return {"[WARN]",  4};
-            case err:      return {"[ERROR]", 5};
-            case critical: return {"[CRIT]",  6};
-            case off:      return {"[OFF]",   7};
-            default:       return {"[IDK]",   8};
-        }
+            initialised = true;
 
-        std::unreachable();
-    };
+            // define colors for spdlog::levels enum
+            init_pair(1, COLOR_CYAN, COLOR_BLACK);    // trace
+            init_pair(2, COLOR_MAGENTA, COLOR_BLACK); // debug
+            init_pair(3, COLOR_GREEN, COLOR_BLACK);   // info
+            init_pair(4, COLOR_YELLOW, COLOR_BLACK);  // warn
+            init_pair(5, COLOR_RED, COLOR_BLACK);     // error
+            init_pair(6, COLOR_WHITE, COLOR_RED);     // critical
+            init_pair(7, COLOR_BLUE, COLOR_BLACK);    // off
+            init_pair(8, COLOR_WHITE, COLOR_BLACK);   // n_levels (idk)
+        }
+    }
 };
+
+} // ncurses namespace
