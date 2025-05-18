@@ -1,7 +1,7 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 #include <chrono>
-#include "curses.cpp"
+#include "ui.h"
 
 struct ui_section {
     int height;
@@ -9,7 +9,7 @@ struct ui_section {
     int starty;
     int startx;
 
-    void apply_self(Ncurses& obj, const std::string name) {
+    void make_window(ui::ncurse& obj, const std::string name) {
         obj.add_win(name, height, width, starty, startx);
     }
 };
@@ -22,7 +22,7 @@ int main() {
      *  Helper structs will be defined to describe each section in the ui.
      *  With the apply_self method, the structs will create windows in the Ncurses object
      */
-    Ncurses curse{};
+    ui::ncurse curse;
 
     auto [height, width] = curse.get_dimensions();
 
@@ -50,11 +50,10 @@ int main() {
         .startx = pos.startx
     };
 
-    code.apply_self(curse,  "code");
-    io.apply_self(curse,    "io");
-    pos.apply_self(curse,   "pos");
-    stack.apply_self(curse, "stack");
-    
+    code.make_window(curse,  "code");
+    io.make_window(curse,    "io");
+    pos.make_window(curse,   "pos");
+    stack.make_window(curse, "stack");
 
     std::cin.get();
 }

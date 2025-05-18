@@ -1,5 +1,9 @@
+#ifndef ui_h
+#define ui_h
+
 #include <string>
 #include <string_view>
+#include <map>
 
 #include <spdlog/sinks/base_sink.h>
 #include <spdlog/details/null_mutex.h>
@@ -7,7 +11,8 @@
 
 #include <ncurses.h>
 
-namespace ncurses {
+namespace ui {
+
 
 class window_base {
 public:
@@ -184,24 +189,26 @@ private:
     static global_state_ global_automatic_;
 };
 
-} // ncurses namespace
+} // ncurses namespace 
 
 
 template <typename... Args>
-void ncurses::window_base::print(const std::string_view format, Args&&... args) {
+void ui::window_base::print(const std::string_view format, Args&&... args) {
         
     std::string msg = fmt::format(format, std::forward<Args>(args)... ); 
     waddstr(window_, msg.c_str());
 }
 
 template <typename... Args>
-void ncurses::window_base::sprint(const std::string_view format, Args&&... args) {
+void ui::window_base::sprint(const std::string_view format, Args&&... args) {
         
     std::string msg = fmt::format(format, std::forward<Args>(args)... ); 
     waddnstr(window_, msg.c_str(), width_); // cut off long outputs
 } 
 
-template <ncurses::DerivedWindow T>
-auto ncurses::ncurse::base_for_win(const std::string name) -> std::unique_ptr<window_base> {
+template <ui::DerivedWindow T>
+auto ui::ncurse::base_for_win(const std::string name) -> std::unique_ptr<window_base> {
     return std::make_unique<T>( windows_.at(name) );
 }
+
+#endif

@@ -40,6 +40,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     list(APPEND SOURCES ${TEST_SOURCES})
 
     add_executable(test_dracula ${SOURCES})
+    target_include_directories(test_dracula PRIVATE ${INCLUDEDIR})
+
     target_link_libraries(test_dracula PRIVATE
         Curses::Curses
         GTest::gtest
@@ -54,8 +56,10 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 else() # Release
 
-    add_executable(dracula ${SOURCES}) 
     message(STATUS "Tests disabled")
+
+    add_executable(dracula ${SOURCES}) 
+    target_include_directories(dracula PRIVATE ${INCLUDEDIR})
 
     target_link_libraries(dracula PRIVATE
         Curses::Curses

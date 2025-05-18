@@ -11,9 +11,9 @@
 #include <spdlog/pattern_formatter.h>
 #include <spdlog/formatter.h>
 
-#include "ncurses.h"
+#include "ui.h" 
 
-namespace ncurses {
+namespace ui {
 
 window_base::window_base(WINDOW* win)
 :   width_( getmaxx(win)-2 ),
@@ -31,7 +31,7 @@ sink_st::sink_st(WINDOW* win)
     scrollok(window_, true);
 }
 
-void sink_st::sink_it_(const spdlog::details::log_msg& msg) override {
+void sink_st::sink_it_(const spdlog::details::log_msg& msg) {
 
     auto [lvl_name, lvl_id] = level_what_(msg.level);
 
@@ -46,9 +46,6 @@ void sink_st::sink_it_(const spdlog::details::log_msg& msg) override {
     wprintw(window_, "\n");
     wrefresh(window_);
 }
-
-void sink_st::flush_() override { wrefresh(window_); }
-
 
 void ncurse::add_win(const std::string name, int height, int width, int start_y, int start_x) { 
 
@@ -107,4 +104,4 @@ ncurse::global_state_::global_state_() {
 
 ncurse::global_state_::~global_state_() { endwin(); }
 
-} // ncurses namespace
+} // ui namespace
