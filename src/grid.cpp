@@ -3,8 +3,8 @@
 
 #include "grid.h"
 
-grid::grid(std::ifstream file, std::shared_ptr<spdlog::logger> logger)
-:   file_( std::move(file) ),
+grid::grid(const char* path, std::shared_ptr<spdlog::logger> logger)
+:   file_( path ),
     logger_( std::move(logger) )
 {
     if (!operator bool())

@@ -16,10 +16,10 @@ public:
      * If an error occurs, the failbit will be set int the file_ member.
      * Use the operator bool() method to check for failures like invalid dimensions of the file.
      * 
-     * @param file filestream to read the grid from
+     * @param path path to file
      * @param logger spdlog::logger used to log
      */
-    grid(std::ifstream file, std::shared_ptr<spdlog::logger> logger);
+    grid(const char* path, std::shared_ptr<spdlog::logger> logger);
 
     /**
      * @brief check for failure bits in the filestream
@@ -46,4 +46,7 @@ public:
 private: 
     std::ifstream file_;
     std::shared_ptr<spdlog::logger> logger_; 
+
+    grid(grid& other) = delete;
+    grid& operator=(grid& other) = delete;
 };
