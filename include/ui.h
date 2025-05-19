@@ -3,8 +3,11 @@
 
 #include <string>
 #include <string_view>
+#include <memory>
+#include <utility>
 #include <map>
 
+#include <spdlog/logger.h>
 #include <spdlog/sinks/base_sink.h>
 #include <spdlog/details/null_mutex.h>
 #include <spdlog/common.h>
@@ -13,14 +16,106 @@
 
 namespace ui {
 
+/**
+ * A window is a window.
+ * Apart from its dimensions, it owns an WINDOW* handle from ncurses.
+ */
 class window_base {
 public:
 
+    window_base(WINDOW* win)
+    :   window_(win),
+        height_( getmaxy(win) ),
+        width_( getmaxy(win) ),
+        starty_( getbegy(win) ),
+        startx_( getbegx(win) )
+    {}   
+
+    window_base(
+        WINDOW* win,
+        int height,
+        int width,
+        int starty,
+        int startx
+    )
+    :   window_(win),
+        height_(height),
+        width_(width),
+        starty_(starty),
+        startx_(startx)
+    {}
+    
+    window_base(
+        int height,
+        int width,
+        int starty = 0,
+        int startx = 0
+    )
+    :   window_( newwin(height, width, starty, startx) ),
+        height_(height),
+        width_(width),
+        starty_(starty),
+        startx_(startx)
+    {}
+
+    WINDOW* window_;
+    int height_;
+    int width_;
+    int starty_;
+    int startx_;
+
+    virtual ~window_base() = default; // leaving destruction to derivatives
+};  
+
+class window : public window_base { 
+
+    window(
+        int height,
+        int width,
+        int starty = 0,
+        int startx = 0
+    )
+    :   window_base(height, width, starty, startx)
+    {}
+
+    window(window& otehr) = delete;
+    window& operator=(window& other) = delete;
+
+    // window owns its window and destroys it
+    ~window() override { delwin(window_); }
+};
+
+class derived_window : public window_base {
+    
+    derived_window(
+        WINDOW* win, 
+        int height,
+        int width,
+        int starty,
+        int startx
+    )
+    :   window_base( derwin(win, height, width, starty, startx) )
+    {}
+
+    ~derived_window() override = default; // derived windows do not own anything
+};
+
+class operator_base {
+public:
+
     /**
-     * @brief Construct a new window base object
+     * @brief Construct a new window handler base object
      * @param win window handle
      */
-    window_base(WINDOW* win);
+    operator_base();
+ 
+    /**
+     * @brief function that will be called to update whats displayed on the screen
+     * 
+     * This function shall be implemented by all derived classes.
+     * It will be called for all registered window handlers.
+     */
+    virtual void update() = 0;
 
     /**
      * @brief print to a window
@@ -38,7 +133,7 @@ public:
      * @brief print to a window without wrapping
      * 
      * The s stands for safe.
-     * This printing function will print to the window and cut off strings that are too long.
+     * This printing function will print to the window and cut off strings that are longe than width_.
      * 
      * @tparam Args 
      * @param format fmt format like in fmt::print
@@ -48,14 +143,30 @@ public:
     void sprint(const std::string_view format, Args&&... args);
 
     /**
+     * @brief get the position of the cursor in the terminal
+     * 
+     * @return std::pair<int, int> height, then width
+     */
+    auto get_cursor() const noexcept -> std::pair<int, int>; 
+
+    /**
+     * @brief set the position of the cursor in the window
+     * 
+     * @param y height
+     * @param x width
+     */
+    void set_cursor(int y, int x) noexcept { wmove(window_, y, x); }
+
+    /**
      * @brief refresh and load any changes in memory
      */
     void refresh() { wrefresh(window_); }
 
-    virtual ~window_base() = default;
+    virtual ~window_handler_base() = default;
 
-private:
-    const int width_; // width is saved for sprint
+protected:
+    const int height_;
+    const int width_; 
     WINDOW* window_;
 };
 
@@ -63,7 +174,7 @@ private:
  * Concept for classes derived from window_base
  */
 template <typename T>
-concept DerivedWindow = std::is_base_of_v<window_base, T>;
+concept DerivedWindowHandler = std::is_base_of_v<window_handler_base, T>;
 
 /**
  * @brief custom sink for spdlog, singe threaded (st)
@@ -126,6 +237,7 @@ public:
 
     ncurse() = default;
 
+
     /**
      * @brief add a window to ncurses
      * 
@@ -141,22 +253,43 @@ public:
     void add_win(const std::string name, int height, int width, int start_y, int start_x);
 
     /**
+     * @brief Overload for window_section structs
+     * 
+     * @param name name of what to call the window
+     * @param section window_section struct
+     */
+    void add_win(const std::string name, const window_section section) { 
+        add_win(name, section.height, section.width, section.starty, section.startx); 
+    }
+
+    /**
      * @brief returns a shared_ptr to a custom sink obj linked to the window specified by name
      * 
      * @param name name of the window
      * @return std::shared_ptr<sink_st> the sink created
      */
-    auto sink_for_win(const std::string name) -> std::shared_ptr<sink_st>;
+    auto sink_for_window(const std::string name) -> std::shared_ptr<sink_st>;
 
     /**
-     * @brief returns a base_ptr to a derived window_base obj holding a handle to a window
+     * @brief register a window handler for a window
      * 
-     * @tparam T derived of the window
-     * @param name name of the window 
-     * @return std::unique_ptr<window_base> unique_ptr to the base
+     * @tparam T derived class of 
+     * @tparam Args 
+     * @param name 
+     * @param args 
      */
-    template <DerivedWindow T>
-    auto base_for_win(const std::string name) -> std::unique_ptr<window_base>;
+    template <DerivedWindowHandler T, typename ...Args>
+    void register_window_handler(const std::string name, Args ...args) { 
+        window_handlers_.insert(name, std::make_unique<T>(windows_.at(name), std::forward<Args>(...args) ) ); 
+    }  
+
+    /**
+     * @brief call the update method of all registered window handlers
+     */
+    void update() {
+        for(auto& handler : window_handlers_)
+            handler.second->update();
+    }
 
     /**
      * @brief delete a window by its name
@@ -179,35 +312,34 @@ public:
 
 private:
     std::map<std::string, WINDOW*> windows_;
+    std::map<std::string, std::unique_ptr<window_handler_base>> window_handlers_;
 
-    struct global_state_ {
+    // TODO find better solution for colors
+    struct global_state_ { 
         global_state_();  // calls ncurses initscr(), makes colour pairs etc.
         ~global_state_(); // calls ncurses endwin()
     };
-
+ 
     static global_state_ global_automatic_;
 };
+
 
 } // ui namespace 
 
 
 template <typename... Args>
-void ui::window_base::print(const std::string_view format, Args&&... args) {
+void ui::window_handler_base::print(const std::string_view format, Args&&... args) {
         
     std::string msg = fmt::format(format, std::forward<Args>(args)... ); 
     waddstr(window_, msg.c_str());
 }
 
 template <typename... Args>
-void ui::window_base::sprint(const std::string_view format, Args&&... args) {
+void ui::window_handler_base::sprint(const std::string_view format, Args&&... args) {
         
     std::string msg = fmt::format(format, std::forward<Args>(args)... ); 
     waddnstr(window_, msg.c_str(), width_); // cut off long outputs
 } 
 
-template <ui::DerivedWindow T>
-auto ui::ncurse::base_for_win(const std::string name) -> std::unique_ptr<window_base> {
-    return std::make_unique<T>( windows_.at(name) );
-}
 
 #endif

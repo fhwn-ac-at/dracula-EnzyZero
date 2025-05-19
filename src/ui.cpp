@@ -11,17 +11,27 @@
 #include <spdlog/pattern_formatter.h>
 #include <spdlog/formatter.h>
 
+#include <ncurses.h>
+
 #include "ui.h" 
 
 namespace ui {
 
-window_base::window_base(WINDOW* win)
-:   width_( getmaxx(win)-2 ),
-    window_( derwin(win, getmaxy(win) - 2, width_, 1, 1) )
+window_handler_base::window_handler_base(WINDOW* win);
+:   height_( getmaxy(win)-2 ),
+    width_( getmaxx(win)-2 ),
+    window_( derwin(win, height_, width_, 1, 1) ),
 {
     // make window scrollable
     scrollok(window_, true);
 } 
+
+auto window_handler_base::get_cursor() const noexcept -> std::pair<int, int> {
+ 
+    std::pair<int, int> res; 
+    getyx(window_, res.first, res.second); 
+    return res;
+}
 
 sink_st::sink_st(WINDOW* win)
 :   width_( getmaxx(win)-2 ),
@@ -100,6 +110,7 @@ ncurse::global_state_::global_state_() {
     init_pair(6, COLOR_WHITE, COLOR_RED);     // critical
     init_pair(7, COLOR_BLUE, COLOR_BLACK);    // off
     init_pair(8, COLOR_WHITE, COLOR_BLACK);   // n_levels (idk)
+    init_pair(10, COLOR_BLUE, COLOR_WHITE);   // for hightlighting the cursor
 }
 
 ncurse::global_state_::~global_state_() { endwin(); }

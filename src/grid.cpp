@@ -61,5 +61,5 @@ grid::grid(const char* path, std::shared_ptr<spdlog::logger> logger)
     return;
 
 critical:
-    logger_->critical("GRID::FILE::ERROR: failbit set!"); 
+    logger_->critical("GRID::FILE::OPENING::ERROR: The given file might not exist"); 
 } 
