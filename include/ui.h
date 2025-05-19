@@ -13,7 +13,6 @@
 
 namespace ui {
 
-
 class window_base {
 public:
 
@@ -189,7 +188,7 @@ private:
     static global_state_ global_automatic_;
 };
 
-} // ncurses namespace 
+} // ui namespace 
 
 
 template <typename... Args>
