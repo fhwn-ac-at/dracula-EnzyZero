@@ -1,73 +1,65 @@
 #include <fstream>
-#include <system_error>
 #include <spdlog/logger.h>
-#include "grid_base.h"
 
-class grid : public grid_base {
-public:
+#include "grid.h"
 
-    grid(std::ifstream file, std::shared_ptr<spdlog::logger> logger)
-    :   file_( std::move(file) ),
-        logger_( std::move(logger) )
+grid::grid(std::ifstream file, std::shared_ptr<spdlog::logger> logger)
+:   file_( std::move(file) ),
+    logger_( std::move(logger) )
+{
+    if (!operator bool())
+        goto critical;
+
+    // read from the ifstream
+    for (auto& line : this->grid_)
     {
-        if (!operator bool())
+        char c{};
+
+        for(auto& field : line)
+        {
+            file_.get(c);
+
+            if (c == '\n' || !file_.good() ) // good includes reaching eof
+                break;
+
+            // add character to row
+            field = c;
+        }
+
+        if ( file_.eof() )
+            break;
+
+        else if (!operator bool()) // file error
             goto critical;
 
-        // read from the ifstream
-        for (auto& line : this->grid_)
+        // if c is not a newline, this will consume the newline (69 characters +1 newline is allowed)
+        else if (c != '\n' && file_.get() != '\n' )
         {
-            char c { file_.get() };
-
-            for(auto& field : line)
-            {
-                if (c == '\n' || !file.good() ) // good includes reaching eof
-                    break;
-
-                // if no error occured, add character to row
-                field = c;
-
-                c = file.get();
-            }
-            
-            if (c != '\n')
-            {
-                // set failbit in file
-                file.setstate(std::ios_base::failbit);
-                logger_->error("GRID::INVALID::SIZE: Line is longer than {}.", line.size());
-                return;
-            }
-            else if ( file.eof() )
-                break;
-            else if (!operator bool()) // file error
-                goto critical;
+            // set failbit in file
+            file_.setstate(std::ios_base::failbit);
+            logger_->error("GRID::INVALID::SIZE: Line is longer than {}.", line.size());
+            return;
         }
+    }
 
-        /*  Now, either eof is reached or
-            the next line is an empty line and the last line (eof after newline).
-            If not, the file does not adhere to the necessary height.
-        */
-        if ( !(file.eof() || (file.get() == '\n' && file.get() == EOF)) ) 
-        {
-            file.setstate(std::ios_base::failbit);
-            logger_->error("GRID::INVALID:SIZE: File has more than {} rows", this->grid_.size());
-        }
+    /*  Now, either eof is reached or
+        eof comes right after the current file pointer or
+        the next line is an empty line and the last line (eof after a newline).
+        If not, the file does not adhere to the necessary height.
+    */
+    if ( !( 
+        file_.eof() ||  
+        file_.peek() == EOF || 
+        (file_.get() == '\n' && file_.get() == EOF)
+        ) 
+    ) 
+    {
+        file_.setstate(std::ios_base::failbit);
+        logger_->error("GRID::INVALID:SIZE: File has more than {} rows", this->grid_.size());
+    }
 
-        return;
+    return;
 
-    critical:
-        logger_->critical("GRID::FILE::ERROR: failbit set!"); 
-    } 
-
-    operator bool() { return !file_.fail(); } 
-
-    using grid_base::atcur;
-    using grid_base::s_atcur;
-
-    auto operator [](size_t i) noexcept -> decltype(grid_[0])& { return this->grid_[i]; }
-
-    ~grid() override = default;
- 
-private: 
-    std::ifstream file_;
-    std::shared_ptr<spdlog::logger> logger_;
-};
+critical:
+    logger_->critical("GRID::FILE::ERROR: failbit set!"); 
+} 

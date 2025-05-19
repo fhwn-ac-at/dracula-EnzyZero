@@ -1,7 +1,10 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 #include <chrono>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
 #include "ui.h"
+#include "grid.h"
 
 struct ui_section {
     int height;
@@ -16,7 +19,7 @@ struct ui_section {
 
 int main() {
 
-
+    #if 0
     /**
      *  Setting up text-based ui with ncurses
      *  Helper structs will be defined to describe each section in the ui.
@@ -56,4 +59,15 @@ int main() {
     stack.make_window(curse, "stack");
 
     std::cin.get();
+
+    #endif
+    
+    auto logger = spdlog::stdout_color_mt("testlogger");
+
+    std::ifstream file("trash/test.txt");
+
+    grid grd(std::move(file), logger);
+
+    logger->info("First char {}", grd.catcur());
+
 }

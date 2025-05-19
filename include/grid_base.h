@@ -22,14 +22,24 @@ public:
 
     Cursor cursor{}; 
 
-    virtual char& s_atcur() { return grid_.at(cursor.y).at(cursor.x); }
-    virtual char& atcur() noexcept { return grid_[cursor.y][cursor.x]; }
+    /**
+     * @brief safe get char at current cursor value in the grid
+     * 
+     * @return char& char at cur
+     */
+    virtual char& catcurs() { return grid_.at(cursor.y).at(cursor.x); }
+
+    /**
+     * @brief unsafe get char at current cursor value in the grid
+     * 
+     * @return char& cahr at cur
+     */
+    virtual char& catcur() noexcept { return grid_[cursor.y][cursor.x]; }
 
     virtual ~grid_base() = default;
 
 protected:
 
-    // matrix with height=42 and width=69, nice
+    // matrix with height=42 and width=69, very sus
     std::array<std::array<char, 69>, 42> grid_{};
-
 };
