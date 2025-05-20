@@ -1,13 +1,12 @@
 #ifndef colors_h
 #define colors_h
-
 #include <ncurses.h>
 #include <assert.h>
 
 namespace ui {
 namespace colors {
 
-enum colors : int {
+enum color : int {
 
     CYAN_BLACK,
     MAGENTA_BLACK,

@@ -2,8 +2,10 @@
 #define window_h 
 
 #include <string_view>
+#include <array>
 #include <ncurses.h>
 
+#include "colors.h"
 
 namespace ui {
 
@@ -16,7 +18,7 @@ public:
         width_( getmaxy(win) ),
         starty_( getbegy(win) ),
         startx_( getbegx(win) )
-    {}   
+    {}
 
     window_base(
         WINDOW* win,
@@ -84,6 +86,22 @@ public:
     void set_cursor(int y, int x) noexcept { wmove(window_, y, x); }
 
     /**
+     * @brief Set a color pair for this window.
+     * 
+     * @param cl an enum value from the color enum
+     */
+    void set_color(colors::color cl) noexcept;
+
+    /**
+     * @brief Remove a currently active color. Must match the previously set color.
+     * 
+     * Errors are not checked.
+     * 
+     * @param cl en enum value from the color enum
+     */
+    void rem_color(colors::color cl) noexcept;
+
+    /**
      * @brief refresh and load any changes in memory
      */
     void refresh() { wrefresh(window_); }
@@ -95,8 +113,24 @@ public:
     int width_;
     int starty_;
     int startx_;
-};  
+};
 
+class subwindow : public window_base {
+    
+    subwindow(
+        window win, 
+        int height,
+        int width,
+        int starty,
+        int startx
+    )
+    :   window_base( derwin(win.window_, height, width, starty, startx) )
+    {}
+
+    ~subwindow() override { delwin(window_); };
+};
+
+template <size_t S>
 class window : public window_base { 
 
     window(
@@ -108,27 +142,35 @@ class window : public window_base {
     :   window_base(height, width, starty, startx)
     {}
 
+    /**
+     * @brief Create a subwindow in the current window
+     * 
+     * All dimensions should fit into the main window.
+     * 
+     * @param height 
+     * @param width 
+     * @param starty 
+     * @param startx 
+     */
+    create_subwindow(int height, int width, int starty, int startx); 
+
+    /**
+     * @brief Delete a subwindow from the array
+     * 
+     * @param pos 
+     */
+    delete_subwindow(int pos);
+
     window(window& other) = delete;
     window& operator=(window& other) = delete;
 
     // window owns its window and destroys it
     ~window() override { delwin(window_); }
+
+    std::vector<subwindow> subwindows;
 };
 
-class derived_window : public window_base {
-    
-    derived_window(
-        WINDOW* win, 
-        int height,
-        int width,
-        int starty,
-        int startx
-    )
-    :   window_base( derwin(win, height, width, starty, startx) )
-    {}
 
-    ~derived_window() override = default; // derived windows do not own anything
-};
 
 } // ui namespace
 

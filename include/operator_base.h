@@ -1,7 +1,8 @@
 #ifndef operator_base_h
 #define operator_base_h
 
-#include "window.h"
+#include <memory>
+#include "windows.h"
 
 namespace ui {
 
@@ -13,9 +14,9 @@ namespace ui {
 class operator_base {
 public:
 
-    operator_base(window& win);
+    operator_base() = default;
  
-    virtual void render() = 0;
+    virtual void render(std::weak_ptr<window> window) = 0;
 
     virtual ~operator_base() = default;
 

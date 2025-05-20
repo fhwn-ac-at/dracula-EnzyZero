@@ -78,7 +78,7 @@ class window : public window_base {
     :   window_base(height, width, starty, startx)
     {}
 
-    window(window& otehr) = delete;
+    window(window& other) = delete;
     window& operator=(window& other) = delete;
 
     // window owns its window and destroys it
