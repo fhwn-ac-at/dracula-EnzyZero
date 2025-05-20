@@ -1,124 +1,21 @@
 #ifndef window_h
 #define window_h 
 
-#include <string_view>
-#include <array>
+#include <string_view>  
+#include <vector>
+#include <memory>
 #include <ncurses.h>
 
+#include "window_base.h"
 #include "colors.h"
 
 namespace ui {
 
-class window_base {
-public:
-
-    window_base(WINDOW* win)
-    :   window_(win),
-        height_( getmaxy(win) ),
-        width_( getmaxy(win) ),
-        starty_( getbegy(win) ),
-        startx_( getbegx(win) )
-    {}
-
-    window_base(
-        WINDOW* win,
-        int height,
-        int width,
-        int starty,
-        int startx
-    )
-    :   window_(win),
-        height_(height),
-        width_(width),
-        starty_(starty),
-        startx_(startx)
-    {}
-    
-    window_base(
-        int height,
-        int width,
-        int starty = 0,
-        int startx = 0
-    )
-    :   window_( newwin(height, width, starty, startx) ),
-        height_(height),
-        width_(width),
-        starty_(starty),
-        startx_(startx)
-    {}
-
-    /**
-     * @brief  print to the window 
-     * 
-     * @tparam Args 
-     * @param format mft format like in fmt::print
-     * @param args any args the format takes
-     */
-    template <typename... Args>
-    void print(const std::string_view format, Args&&... args);
-
-    /**
-     * @brief print to a window without wrapping
-     * 
-     * The s stands for safe.
-     * This printing function will print to the window and cut off strings that are longe than width_.
-     * 
-     * @tparam Args 
-     * @param format fmt format like in fmt::print
-     * @param args any args the format takes
-     */
-    template <typename... Args>
-    void sprint(const std::string_view format, Args&&... args);
-
-    /**
-     * @brief get the position of the cursor in the terminal
-     * 
-     * @return std::pair<int, int> height, then width
-     */
-    auto get_cursor() const noexcept -> std::pair<int, int>; 
-
-    /**
-     * @brief set the position of the cursor in the window
-     * 
-     * @param y height
-     * @param x width
-     */
-    void set_cursor(int y, int x) noexcept { wmove(window_, y, x); }
-
-    /**
-     * @brief Set a color pair for this window.
-     * 
-     * @param cl an enum value from the color enum
-     */
-    void set_color(colors::color cl) noexcept;
-
-    /**
-     * @brief Remove a currently active color. Must match the previously set color.
-     * 
-     * Errors are not checked.
-     * 
-     * @param cl en enum value from the color enum
-     */
-    void rem_color(colors::color cl) noexcept;
-
-    /**
-     * @brief refresh and load any changes in memory
-     */
-    void refresh() { wrefresh(window_); }
-
-    virtual ~window_base() = default; // leaving destruction to derivatives
-
-    WINDOW* window_;
-    int height_;
-    int width_;
-    int starty_;
-    int startx_;
-};
 
 class subwindow : public window_base {
     
     subwindow(
-        window win, 
+        window_base& win, 
         int height,
         int width,
         int starty,
@@ -127,10 +24,13 @@ class subwindow : public window_base {
     :   window_base( derwin(win.window_, height, width, starty, startx) )
     {}
 
+    subwindow(window_base& win)
+    :   window_base( derwin(win.window_, win.height_-2, win.width_-2, win.starty_+1, win.startx_+1) )
+    {}
+
     ~subwindow() override { delwin(window_); };
 };
 
-template <size_t S>
 class window : public window_base { 
 
     window(
@@ -151,26 +51,50 @@ class window : public window_base {
      * @param width 
      * @param starty 
      * @param startx 
+     * 
+     * @return int returns the index of where the subwindow is located in the vector
      */
-    create_subwindow(int height, int width, int starty, int startx); 
+    int create_subwindow(int height, int width, int starty, int startx) {
+        subwindows_.emplace_back(std::make_unique<subwindow>(*this, height, width, starty, startx)); 
+        return subwindows_.size() - 1;
+    }
 
     /**
-     * @brief Delete a subwindow from the array
+     * @brief Create a subwindow 
+     * 
+     * Subwindow will fit into the borders of the window. 
+     * 
+     * @return int returns the index of where the subwindow is located in the vector
+     */
+    int create_subwindow() {
+        subwindows_.emplace_back(std::make_unique<subwindow>(*this)); 
+        return subwindows_.size() - 1;
+    } 
+
+    /**
+     * @brief Get a subwindow from the vector
+     * 
+     * @param pos 
+     * @return subwindow& reference to the saved subwindow
+     */
+    subwindow& get_subwindow(int pos) { return *(subwindows_.at(pos)); }
+
+    /**
+     * @brief Delete a subwindow from the vector
      * 
      * @param pos 
      */
-    delete_subwindow(int pos);
-
-    window(window& other) = delete;
-    window& operator=(window& other) = delete;
+    void delete_subwindow(int pos) { subwindows_.erase( subwindows_.begin() + pos); }
 
     // window owns its window and destroys it
     ~window() override { delwin(window_); }
 
-    std::vector<subwindow> subwindows;
+private:
+    window(window& other) = delete;
+    window& operator=(window& other) = delete; 
+
+    std::vector<std::unique_ptr<subwindow>> subwindows_;
 };
-
-
 
 } // ui namespace
 

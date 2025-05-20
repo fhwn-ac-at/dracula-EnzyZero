@@ -1,5 +1,6 @@
 #ifndef colors_h
 #define colors_h
+
 #include <ncurses.h>
 #include <assert.h>
 

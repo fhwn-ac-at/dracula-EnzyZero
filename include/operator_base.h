@@ -1,7 +1,6 @@
 #ifndef operator_base_h
 #define operator_base_h
 
-#include <memory>
 #include "windows.h"
 
 namespace ui {
@@ -16,13 +15,18 @@ public:
 
     operator_base() = default;
  
-    virtual void render(std::weak_ptr<window> window) = 0;
+    // this will be called when an operator is coupled to a window
+    virtual void startup(window& win) = 0;
+
+    // will becalled each time
+    virtual void render(window& win) = 0;
 
     virtual ~operator_base() = default;
-
-protected:
-    window& winref_;
 };
+
+// concept for checking derivatives
+template <typename T>
+concept DerivedOperator = std::is_base_of_v<operator_base, T>;
 
 } // ui namespace
 
