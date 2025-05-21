@@ -1,4 +1,10 @@
 #include <array>
+#include <spdlog/logger.h>
+#include "operator_base.h" 
+
+namespace ui { class grid_operator; }
+
+
 
 class grid_base {
 public:
@@ -42,4 +48,30 @@ protected:
 
     // matrix with height=42 and width=69, very sus
     std::array<std::array<char, 69>, 42> grid_{};
+
+    friend class ui::grid_operator;
 };
+
+
+namespace ui {
+
+class grid_operator : public operator_base {
+
+    grid_operator(
+        grid_base& grid,
+        std::shared_ptr<spdlog::logger> logger
+    )
+    :   grid_( grid ),
+        logger_( std::move(logger) )
+    {}
+
+    void setup(window& win) override; 
+
+    void render(window& win) override; 
+
+private: 
+    grid_base& grid_;
+    std::shared_ptr<spdlog::logger> logger_;
+};
+
+} // ui namespace

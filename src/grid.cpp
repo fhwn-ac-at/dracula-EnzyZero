@@ -2,6 +2,7 @@
 #include <spdlog/logger.h>
 
 #include "grid.h"
+#include "operator_base.h"
 
 grid::grid(const char* path, std::shared_ptr<spdlog::logger> logger)
 :   file_( path ),
@@ -62,4 +63,4 @@ grid::grid(const char* path, std::shared_ptr<spdlog::logger> logger)
 
 critical:
     logger_->critical("GRID::FILE::OPENING::ERROR: The given file might not exist"); 
-} 
+}

@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <ncurses.h>
+#include <utility>
 
 #include "global_ncurses.h"
 #include "window_base.h"
@@ -12,7 +13,8 @@
 
 namespace ui {
 
-class subwindow : public window_base {
+class subwindow : public window_base { 
+public:
     
     subwindow(
         window_base& win, 
@@ -25,13 +27,17 @@ class subwindow : public window_base {
     {}
 
     subwindow(window_base& win)
-    :   window_base( derwin(win.window_, win.height_-2, win.width_-2, win.starty_+1, win.startx_+1) )
+    :   window_base( derwin(win.window_, win.height-2, win.width-2, win.starty+1, win.startx+1) )
     {}
 
-    ~subwindow() override { delwin(window_); };
+    ~subwindow() override { delwin(window_); }; 
+
+private:
+    using window_base::window_;
 };
 
 class window : public window_base { 
+public:
 
     window(
         int height,
@@ -41,6 +47,12 @@ class window : public window_base {
     )
     :   window_base(height, width, starty, startx)
     {}
+
+    window(window&& other) noexcept
+    :   window_base( std::exchange(other.window_, nullptr), other.height, other.width, other.starty, other.startx)
+    {}
+
+    window& operator=(window&& other) noexcept;
 
     /**
      * @brief Create a subwindow in the current window
@@ -87,15 +99,31 @@ class window : public window_base {
     void delete_subwindow(int pos) { subwindows_.erase( subwindows_.begin() + pos); }
 
     // window owns its window and destroys it
-    ~window() override { delwin(window_); }
+    ~window() override { if (window_) delwin(window_); }
 
 private:
     window(window& other) = delete;
     window& operator=(window& other) = delete; 
 
     std::vector<std::unique_ptr<subwindow>> subwindows_;
+
+    using window_base::window_;
 };
 
-} // ui namespace
+} // ui namespace 
+
+inline ui::window& ui::window::operator=(window&& other) noexcept {
+        
+    if (window_)
+        delwin(window_);
+
+    window_ = std::exchange(other.window_, nullptr);
+    height = other.height;
+    width = other.width;
+    starty = other.starty;
+    startx = other.startx;
+
+    return *this;
+}
 
 #endif

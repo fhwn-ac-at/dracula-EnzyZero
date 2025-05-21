@@ -7,7 +7,15 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set flags for each build type
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -DDEBUG_MODE")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG") 
+
+# hack from https://www.reddit.com/r/cpp/comments/1b6f3s4/any_news_on_when_libc_is_going_to_support/
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # Workaround for std::expected not available in clang
+  add_compile_options(
+    -stdlib=libstdc++ -D__cpp_concepts=202002 -Wno-builtin-macro-redefined
+  )
+endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "CXX flags: ${CMAKE_CXX_FLAGS}")
@@ -47,7 +55,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         GTest::gtest
         GTest::gtest_main
         spdlog::spdlog
-        fmt::fmt
+        fmt::fmt 
     )
 
     # automate registering tests to ctest

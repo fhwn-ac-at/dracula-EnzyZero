@@ -16,7 +16,7 @@ public:
     operator_base() = default;
  
     // this will be called when an operator is coupled to a window
-    virtual void startup(window& win) = 0;
+    virtual void setup(window& win) = 0;
 
     // will becalled each time
     virtual void render(window& win) = 0;

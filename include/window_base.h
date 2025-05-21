@@ -2,7 +2,7 @@
 #define window_base_h 
 
 #include <ncurses.h> 
-#include <fmt/format.h>
+#include <format>
 #include "global_ncurses.h"
 #include "colors.h"
 
@@ -15,10 +15,10 @@ public:
 
     window_base(WINDOW* win)
     :   window_(win),
-        height_( getmaxy(win) ),
-        width_( getmaxy(win) ),
-        starty_( getbegy(win) ),
-        startx_( getbegx(win) )
+        height( getmaxy(win) ),
+        width( getmaxy(win) ),
+        starty( getbegy(win) ),
+        startx( getbegx(win) )
     {}
 
     window_base(
@@ -29,10 +29,10 @@ public:
         int startx
     )
     :   window_(win),
-        height_(height),
-        width_(width),
-        starty_(starty),
-        startx_(startx)
+        height(height),
+        width(width),
+        starty(starty),
+        startx(startx)
     {}
     
     window_base(
@@ -42,10 +42,10 @@ public:
         int startx = 0
     )
     :   window_( newwin(height, width, starty, startx) ),
-        height_(height),
-        width_(width),
-        starty_(starty),
-        startx_(startx)
+        height(height),
+        width(width),
+        starty(starty),
+        startx(startx)
     {}
 
     /**
@@ -62,7 +62,7 @@ public:
      * @brief print to a window without wrapping
      * 
      * The s stands for safe.
-     * This printing function will print to the window and cut off strings that are longe than width_.
+     * This printing function will print to the window and cut off strings that are longe than width.
      * 
      * @tparam Args 
      * @param format fmt format like in fmt::print
@@ -110,22 +110,29 @@ public:
     /**
      * @brief clear a window from all contents
      */
-    void clear() { wclear(window_); }
+    void clear() { wclear(window_); } 
+
 
     virtual ~window_base() = default; // leaving destruction to derivatives
 
-
     WINDOW* window_;
-    int height_;
-    int width_;
-    int starty_;
-    int startx_;
+    int height;
+    int width;
+    int starty;
+    int startx;
 };
+
+
+/**
+ * The main window (actually called stdscr)
+ */
+inline window_base mainwin(stdscr, getmaxy(stdscr), getmaxx(stdscr), 0, 0); 
+
 
 } // ui namespace 
 
 
-auto ui::window_base::get_cursor() const noexcept -> std::pair<int, int> {
+inline auto ui::window_base::get_cursor() const noexcept -> std::pair<int, int> {
  
     std::pair<int, int> res; 
     getyx(window_, res.first, res.second); 
@@ -135,15 +142,15 @@ auto ui::window_base::get_cursor() const noexcept -> std::pair<int, int> {
 template <typename... Args>
 void ui::window_base::print(const std::string_view format, Args&&... args) {
         
-    std::string msg = fmt::format(format, std::forward<Args>(args)... ); 
+    std::string msg = std::vformat(format, std::make_format_args(args...) ); 
     waddstr(window_, msg.c_str());
 }
 
 template <typename... Args>
 void ui::window_base::sprint(const std::string_view format, Args&&... args) {
         
-    std::string msg = fmt::format(format, std::forward<Args>(args)... ); 
-    waddnstr(window_, msg.c_str(), width_); // cut off long outputs
+    std::string msg = std::vformat(format, std::make_format_args(args...) ); 
+    waddnstr(window_, msg.c_str(), width); // cut off long outputs
 }
 
 #endif

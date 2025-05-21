@@ -2,7 +2,6 @@
 #include <spdlog/logger.h>
 #include <memory>
 #include "grid_base.h"
-#include "ui_window_handlers.h"
 
 class grid : public grid_base {
 public:
@@ -50,6 +49,5 @@ private:
 
     grid(grid& other) = delete;
     grid& operator=(grid& other) = delete;
-
-   friend class grid_window_handle;
 };
+

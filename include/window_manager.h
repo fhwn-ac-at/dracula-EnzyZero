@@ -25,14 +25,14 @@ public:
         not_found
     };
 
-    auto create_window(int height, int width, int startx, int starty) -> std::expected<int, error>; 
-    
-    auto create_window(window&& other) -> std::expected<int, error>;
+    [[nodiscard]] auto create_window(window&& other) -> std::expected<int, error>; 
+
+    [[nodiscard]] auto create_window(int height, int width, int startx, int starty) -> std::expected<int, error>; 
 
     error remove_window(int id); 
 
     template <DerivedOperator Op, typename... Args>
-    auto create_operator(Args&& ...args) -> std::expected<int, error>;
+    [[nodiscard]] auto create_operator(Args&& ...args) -> std::expected<int, error>;
    
     error remove_operator(int id);
 

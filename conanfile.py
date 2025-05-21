@@ -9,7 +9,8 @@ class DraculaInterpreter(ConanFile):
         self.requires("ncurses/6.4")
         self.requires("gtest/1.16.0")
         self.requires("fmt/11.1.3")
-        self.requires("spdlog/1.15.1")
+        self.requires("spdlog/1.15.1") 
+        self.requires("tl-expected/20190710")
 
     def build_requirements(self):
         self.tool_requires("cmake/3.25.3")

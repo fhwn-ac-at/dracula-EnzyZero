@@ -10,14 +10,14 @@ auto window_manager::create_window(int height, int width, int startx, int starty
 
     auto res_pair = windows_.emplace( id_generator_++, std::make_unique<window>(height, width, starty, startx));
     if (!res_pair.second)
-        std::unexpected(creation_failed);
+        return std::unexpected(creation_failed);
 
     return id_generator_;
 }
 
 auto window_manager::create_window(window&& other) -> std::expected<int, error> {
 
-    auto res_pair = windows_.emplace( id_generator_++, std::make_unique<window>(other));
+    auto res_pair = windows_.emplace( id_generator_++, std::make_unique<window>( std::move(other) ));
     if (!res_pair.second)
         return std::unexpected(creation_failed);
 
@@ -44,7 +44,7 @@ error window_manager::remove_window(int id) {
 template <DerivedOperator Op, typename... Args>
 auto window_manager::create_operator(Args&& ...args) -> std::expected<int, error> {
 
-    auto res_pair = operator_.emplace( id_generator_++, std::make_unique<window>( std::forward<Args>(args)... ));
+    auto res_pair = operators_.emplace( id_generator_++, std::make_unique<window>( std::forward<Args>(args)... ));
     if (!res_pair.second) 
         return std::unexpected(creation_failed);
 
@@ -77,7 +77,7 @@ error window_manager::pair_window_operator(int window_id, int operator_id) {
         return not_found;
 
     // call startup method of operator here
-    op_it->second->startup( *win_it->second );
+    op_it->second->setup( *win_it->second );
 
     // register the pair
     if (auto res_pair = window_operator_pairs_.emplace_back(window_id, operator_id); 
