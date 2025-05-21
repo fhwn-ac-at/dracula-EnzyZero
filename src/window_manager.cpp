@@ -1,35 +1,30 @@
-#ifndef window_manager_h
-#define window_manager_h
+#include <expected>
+#include <string>
+#include "window_manager.h"
 
-#include <unordered_map> 
-#include <stdexcept>
-#include <memory> 
-#include <utility>
-#include <vector>
+namespace ui { 
 
-#include "global_ncurses.h"
-#include "windows.h"
-#include "operator_base.h"
+using namespace window_manager;
 
-namespace ui {
+std::expected<int, error> 
+    window_manager::create_window(int height, int width, int startx, int starty) { 
+    auto res_pair = windows_.emplace( id_generator_++, std::make_unique<window>(height, width, starty, startx));
+    if (!res_pair.second)
+        std::unexpected(insertion_failed);
 
-class window_manager {
-public:
+    return id_generator_;
+}
 
-    window_manager() = default;
+std::expected<int, window_manager::error>
+    create_window(window&& other) {
+        auto res_pair = windows_.emplace( id_generator_++, std::make_unique<window>(other));
+        if (!res_pair.second)
+            return std::unexpected(insertion_failed);
 
-    enum error : int { 
-        ok,
-        creation_failed,
-        removing_failed,
-        not_found
-    };
+        return id_generator_;
+    } 
 
-    auto create_window(int height, int width, int startx, int starty) -> std::expected<int, error>; 
-    
-    auto create_window(window&& other) -> std::expected<int, error>;
-
-    error remove_window(int id) { 
+error window_manager::remove_window(int id) { 
 
         // remove all window_operator pairs with the window
         std::erase_if(window_operator_pairs_, [&id](const auto& pair) {
@@ -102,15 +97,5 @@ public:
         }
     }
 
-    ~window_manager() = default;
- 
-private:
-    unsigned id_generator_{1};
-    std::unordered_map<int, std::unique_ptr<window>> windows_;
-    std::unordered_map<int, std::unique_ptr<operator_base>> operators_;
-    std::vector<std::pair<int, int>> window_operator_pairs_;
-};
+} // ui namespace 
 
-} // ui namespace
-
-#endif

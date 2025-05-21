@@ -3,6 +3,7 @@
 
 #include <ncurses.h> 
 #include <fmt/format.h>
+#include "global_ncurses.h"
 #include "colors.h"
 
 // this is header only

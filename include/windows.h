@@ -6,11 +6,11 @@
 #include <memory>
 #include <ncurses.h>
 
+#include "global_ncurses.h"
 #include "window_base.h"
 #include "colors.h"
 
 namespace ui {
-
 
 class subwindow : public window_base {
     
