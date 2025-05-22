@@ -1,9 +1,11 @@
+#ifndef grid_base_h
+#define grid_base_h
+
 #include <array>
 #include <spdlog/logger.h>
-#include "operator_base.h" 
+#include "operator_base.h"
 
 namespace ui { class grid_operator; }
-
 
 
 class grid_base {
@@ -55,23 +57,16 @@ protected:
 
 namespace ui {
 
-class grid_operator : public operator_base {
+class grid_operator final : public operator_base {
+public:
 
-    grid_operator(
-        grid_base& grid,
-        std::shared_ptr<spdlog::logger> logger
-    )
-    :   grid_( grid ),
-        logger_( std::move(logger) )
-    {}
+    using operator_base::operator_base;
 
-    void setup(window& win) override; 
+    void render() override;
 
-    void render(window& win) override; 
-
-private: 
-    grid_base& grid_;
-    std::shared_ptr<spdlog::logger> logger_;
+    ~grid_operator() override = default;
 };
 
 } // ui namespace
+
+#endif

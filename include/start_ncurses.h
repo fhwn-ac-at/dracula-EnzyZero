@@ -2,13 +2,17 @@
 #define global_ncurses_h
 
 #include <ncurses.h>
-#include "colors.h"
+#include "colors.h" 
+#include "window_base.h" 
 
 namespace ui {
 
-inline struct GlobalNcurses {
+struct ncurses {
 
-    explicit GlobalNcurses() {
+    ncurses() 
+    :   mainwin(0, 0, 0, 0)
+    { 
+
         initscr();
         curs_set(0); 
         refresh(); // for some reason, not refreshing at start breaks stuff later :(
@@ -16,12 +20,15 @@ inline struct GlobalNcurses {
         // noecho()
         // keypad(stdscr, TRUE)
         
-        colors::init_colors();
+        colors::init_colors(); 
+
+        mainwin = {stdscr};
     }
  
-    ~GlobalNcurses() { endwin(); }
+    ~ncurses() { endwin(); }  
 
-} global_ncurses;
+    window_base mainwin;
+};
 
 } // ui namespace
 

@@ -4,7 +4,7 @@
 #include "grid.h"
 #include "operator_base.h"
 
-grid::grid(const char* path, std::shared_ptr<spdlog::logger> logger)
+Grid::Grid(const char* path, std::shared_ptr<spdlog::logger> logger)
 :   file_( path ),
     logger_( std::move(logger) )
 {
@@ -59,6 +59,8 @@ grid::grid(const char* path, std::shared_ptr<spdlog::logger> logger)
         logger_->error("GRID::INVALID:SIZE: File has more than {} rows", this->grid_.size());
     }
 
+    // else, clear all failbits (get might set failbit on reaching eof)
+    file_.clear(file_.rdstate() & ~std::ios::failbit);
     return;
 
 critical:

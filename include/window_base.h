@@ -3,7 +3,6 @@
 
 #include <ncurses.h> 
 #include <format>
-#include "global_ncurses.h"
 #include "colors.h"
 
 // this is header only
@@ -13,13 +12,7 @@ namespace ui {
 class window_base {
 public:
 
-    window_base(WINDOW* win)
-    :   window_(win),
-        height( getmaxy(win) ),
-        width( getmaxy(win) ),
-        starty( getbegy(win) ),
-        startx( getbegx(win) )
-    {}
+    window_base(WINDOW* win);
 
     window_base(
         WINDOW* win,
@@ -27,26 +20,14 @@ public:
         int width,
         int starty,
         int startx
-    )
-    :   window_(win),
-        height(height),
-        width(width),
-        starty(starty),
-        startx(startx)
-    {}
-    
+    );
+   
     window_base(
         int height,
         int width,
         int starty = 0,
         int startx = 0
-    )
-    :   window_( newwin(height, width, starty, startx) ),
-        height(height),
-        width(width),
-        starty(starty),
-        startx(startx)
-    {}
+    );
 
     /**
      * @brief  print to the window 
@@ -100,7 +81,14 @@ public:
      * 
      * @param cl en enum value from the color enum
      */
-    void rem_textcolor(colors::color cl) noexcept { wattroff(window_, COLOR_PAIR(cl)); }
+    void rem_textcolor(colors::color cl) noexcept { wattroff(window_, COLOR_PAIR(cl)); } 
+
+    /**
+     * @brief make some classic borders with vertical and horizontal lines
+     */
+    void make_classic_border() noexcept; 
+
+    void set_scrollok(bool b) noexcept { scrollok(window_, b); }
 
     /**
      * @brief refresh and load any changes in memory
@@ -112,7 +100,6 @@ public:
      */
     void clear() { wclear(window_); } 
 
-
     virtual ~window_base() = default; // leaving destruction to derivatives
 
     WINDOW* window_;
@@ -122,22 +109,8 @@ public:
     int startx;
 };
 
-
-/**
- * The main window (actually called stdscr)
- */
-inline window_base mainwin(stdscr, getmaxy(stdscr), getmaxx(stdscr), 0, 0); 
-
-
 } // ui namespace 
 
-
-inline auto ui::window_base::get_cursor() const noexcept -> std::pair<int, int> {
- 
-    std::pair<int, int> res; 
-    getyx(window_, res.first, res.second); 
-    return res;
-}
 
 template <typename... Args>
 void ui::window_base::print(const std::string_view format, Args&&... args) {

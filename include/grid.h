@@ -3,7 +3,7 @@
 #include <memory>
 #include "grid_base.h"
 
-class grid : public grid_base {
+class Grid : public grid_base {
 public:
 
     /**
@@ -19,7 +19,7 @@ public:
      * @param path path to file
      * @param logger spdlog::logger used to log
      */
-    grid(const char* path, std::shared_ptr<spdlog::logger> logger);
+    Grid(const char* path, std::shared_ptr<spdlog::logger> logger);
 
     /**
      * @brief check for failure bits in the filestream
@@ -41,13 +41,13 @@ public:
      */
     auto operator [](size_t i) noexcept -> decltype(grid_[0])& { return this->grid_[i]; }
 
-    ~grid() override = default;
+    ~Grid() override = default;
  
 private: 
     std::ifstream file_;
     std::shared_ptr<spdlog::logger> logger_; 
 
-    grid(grid& other) = delete;
-    grid& operator=(grid& other) = delete;
+    Grid(Grid& other) = delete;
+    Grid& operator=(Grid& other) = delete;
 };
 

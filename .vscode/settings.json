@@ -69,6 +69,10 @@
         "locale": "cpp",
         "print": "cpp",
         "queue": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "deque": "cpp",
+        "map": "cpp",
+        "ranges": "cpp",
+        "*.in": "cpp"
     }
 }

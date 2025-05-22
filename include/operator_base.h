@@ -1,27 +1,30 @@
 #ifndef operator_base_h
 #define operator_base_h
 
-#include "windows.h"
+#include <memory>
+#include <spdlog/logger.h>
+#include "window_base.h"
 
 namespace ui {
 
-/**
- * Interface all operators must adhere to.
- * Operators take a ref to a window and use their methods to modify whats displayed.
- * The window manager calls render() on all registered operators. 
- */
 class operator_base {
 public:
 
-    operator_base() = default;
- 
-    // this will be called when an operator is coupled to a window
-    virtual void setup(window& win) = 0;
+    operator_base(
+        window_base& window,
+        std::shared_ptr<spdlog::logger>& logger
+    )
+    :   window_( window ),
+        logger_( logger )
+    {}
 
-    // will becalled each time
-    virtual void render(window& win) = 0;
+    virtual void render() = 0;
 
     virtual ~operator_base() = default;
+
+protected:
+    window_base& window_;
+    std::shared_ptr<spdlog::logger> logger_;
 };
 
 // concept for checking derivatives
