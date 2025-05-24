@@ -17,8 +17,8 @@ public:
     bool empty() { return vector_.empty(); }
     operator bool() { return !empty(); }
 
-    std::vector<T>::iterator begin() { return vector_.begin(); }
-    std::vector<T>::iterator end() { return vector_.end(); }
+    std::vector<T>::reverse_iterator begin() { return vector_.rbegin(); }
+    std::vector<T>::reverse_iterator end() { return vector_.rend(); }
 
 private:  
     std::vector<T> vector_;

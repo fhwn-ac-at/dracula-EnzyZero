@@ -1,8 +1,7 @@
 #include <fstream>
 #include <spdlog/logger.h>
-
 #include "grid.h"
-#include "operator_base.h"
+
 
 Grid::Grid(const char* path, std::shared_ptr<spdlog::logger> logger)
 :   file_( path ),

@@ -22,11 +22,11 @@ public:
         const char c, 
         grid_base& grid, 
         stack<commands::stack_value_type>& stack, 
-        std::iostream& istream, 
+        std::istream& istream, 
         std::ostream& ostream, 
-        std::shared_ptr<spdlog::logger> logger 
+        std::shared_ptr<spdlog::logger>& logger 
     ) 
-    const 
+    const noexcept 
     { 
         const unsigned key = hash(c);
         return key > MAX_HASH_VALUE ? commands::invalid_char : commands_[key](grid, stack, istream, ostream, logger);
@@ -34,9 +34,9 @@ public:
 
 private:
 
-    static constexpr int TOTAL_KEYWORDS = 31;
+    static constexpr int TOTAL_KEYWORDS = 31; 
     static constexpr int MIN_HASH_VALUE = 0;
-    static constexpr int MAX_HASH_VALUE = 31; 
+    static constexpr int MAX_HASH_VALUE = 30; 
 
     const std::array<commands::signature, TOTAL_KEYWORDS> commands_; 
 
