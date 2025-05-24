@@ -9,6 +9,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -DDEBUG_MODE")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG") 
 
+option(TESTING "Option for building tests" OFF)
+
 # hack from https://www.reddit.com/r/cpp/comments/1b6f3s4/any_news_on_when_libc_is_going_to_support/
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # Workaround for std::expected not available in clang
@@ -29,13 +31,13 @@ find_package(fmt REQUIRED)
 # Dirs to resources
 set(INCLUDEDIR ${CMAKE_SOURCE_DIR}/include)
 set(SRCDIR ${CMAKE_SOURCE_DIR}/src)
-set(TESTDIR ${CMAKE_SOURCE_DIR}/test)
+set(TESTDIR ${CMAKE_SOURCE_DIR}/tests)
 
 # collect all cpp files in src
 file(GLOB SOURCES ${SRCDIR}/*.cpp)
 
-# Tests are built in Debug mode
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+# Tests are build if TESTING is on
+if(TESTING)
 
     include(CTest)
 
@@ -45,15 +47,14 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     # Remove main.cpp and append all cpp files in test folder to sources
     list(REMOVE_ITEM SOURCES "${SRCDIR}/main.cpp")
     file(GLOB TEST_SOURCES ${TESTDIR}/*.cpp)
-    list(APPEND SOURCES ${TEST_SOURCES})
+    list(APPEND SOURCES ${TEST_SOURCES}) 
 
-    add_executable(test_dracula ${SOURCES})
+    add_executable(test_dracula ${TEST_SOURCES})
     target_include_directories(test_dracula PRIVATE ${INCLUDEDIR})
 
     target_link_libraries(test_dracula PRIVATE
         Curses::Curses
-        GTest::gtest
-        GTest::gtest_main
+        gtest::gtest
         spdlog::spdlog
         fmt::fmt 
     )
@@ -62,7 +63,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     include(GoogleTest)
     gtest_discover_tests(test_dracula)
 
-else() # Release
+else() # not testing
 
     message(STATUS "Tests disabled")
 
