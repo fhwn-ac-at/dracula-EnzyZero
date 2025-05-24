@@ -44,7 +44,8 @@ auto ui::window_base::get_cursor() const noexcept -> std::pair<int, int> {
     return res;
 }
 
-void ui::window_base::make_classic_border() noexcept {
+/*
+void ui::window_base::box(char vertical, char horizontal) noexcept {
 
     wborder(window_, 
         ACS_VLINE, ACS_VLINE,     // Left, Right: vertical bars
@@ -53,6 +54,6 @@ void ui::window_base::make_classic_border() noexcept {
         ACS_LLCORNER, ACS_LRCORNER  // Bottom-left, Bottom-right
     );
 }
-
+*/
 
 } // ui namespace
