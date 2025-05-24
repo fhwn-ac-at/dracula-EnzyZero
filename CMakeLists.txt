@@ -49,12 +49,13 @@ if(TESTING)
     file(GLOB TEST_SOURCES ${TESTDIR}/*.cpp)
     list(APPEND SOURCES ${TEST_SOURCES}) 
 
-    add_executable(test_dracula ${TEST_SOURCES})
+    add_executable(test_dracula ${SOURCES})
     target_include_directories(test_dracula PRIVATE ${INCLUDEDIR})
 
     target_link_libraries(test_dracula PRIVATE
-        Curses::Curses
-        gtest::gtest
+        Curses::Curses 
+        GTest::GTest
+        GTest::gtest_main 
         spdlog::spdlog
         fmt::fmt 
     )

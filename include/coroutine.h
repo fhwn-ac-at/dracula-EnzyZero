@@ -16,7 +16,7 @@ struct Coroutine {
         }
 
         auto initial_suspend() { return std::suspend_always{}; }
-        auto final_suspend() { return std::suspend_always{}; }
+        auto final_suspend() noexcept { return std::suspend_always{}; }
 
         void return_void() {}
         void unhandled_exception() {}

@@ -5,21 +5,21 @@
 #include <spdlog/logger.h>
 #include <memory>
 #include "grid_base.h"
+#include "perf_hashtable.h"
 #include "stack.h"
 #include "coroutine.h" 
 
 class Interpreter {
 public:
 
-    using value_type = long;
-
     Interpreter(
-        grid_base& grid, 
+        grid_base& grid,  
+        const perf_hashtable& hasht,
         std::istream& istream, 
         std::ostream& ostream, 
         std::shared_ptr<spdlog::logger>& logger
     ) 
-    :   grid_(grid), istream_(istream), ostream_(ostream), logger_(logger), coro_(interpret())
+    :   grid_(grid), hasht_(hasht), istream_(istream), ostream_(ostream), logger_(logger), coro_(interpret())
     {}
 
     operator bool() { return !!coro_; }
@@ -30,19 +30,19 @@ public:
 
     ~Interpreter() = default;
 
-private:
-    Stack<value_type> stack_;
+
+    /// @details these members are public for derivatives of operator_base
+    stack<long> stack_;
     grid_base& grid_;
-    std::istream& istream_;
+
+private:
+    const perf_hashtable& hasht_;
     std::ostream& ostream_;
-    std::shared_ptr<spdlog::logger> logger_;
+    std::istream& istream_;
+    std::shared_ptr<spdlog::logger> logger_; 
+
     Coroutine coro_;
-
     Coroutine interpret() { co_return; }
-
-    
-    friend class ui::grid_operator;
 };
-
 
 #endif

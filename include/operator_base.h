@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <spdlog/logger.h>
-#include "window_base.h"
+#include "window_base.h"  
 #include "interpreter.h"
 
 namespace ui {
@@ -33,5 +33,7 @@ template <typename T>
 concept DerivedOperator = std::is_base_of_v<operator_base, T>;
 
 } // ui namespace
+
+#include "interpreter.h"
 
 #endif

@@ -58,7 +58,7 @@ public:
     }
 
     void create_subwindow() {
-        subwindows_.emplace_back(std::make_unique<subwindow>(*this)); 
+        subwindows_.emplace_back(*this); 
     } 
 
     auto subwindows() -> std::vector<subwindow>& { return subwindows_; }

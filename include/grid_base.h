@@ -3,10 +3,6 @@
 
 #include <array>
 #include <spdlog/logger.h>
-#include "operator_base.h"
-
-namespace ui { class grid_operator; }
-
 
 class grid_base {
 public:
@@ -46,27 +42,8 @@ public:
 
     virtual ~grid_base() = default;
 
-protected:
-
     // matrix with height=42 and width=69, very sus
     std::array<std::array<char, 69>, 42> grid_{};
-
-    friend class ui::grid_operator;
 };
-
-
-namespace ui {
-
-class grid_operator final : public operator_base {
-public:
-
-    using operator_base::operator_base;
-
-    void render(Interpreter& interpreter) override;
-
-    ~grid_operator() override = default;
-};
-
-} // ui namespace
 
 #endif

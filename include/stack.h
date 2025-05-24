@@ -4,7 +4,7 @@
 #include <vector>
 
 template <typename T>
-class Stack {
+class stack {
 public:
 
     T& peek() { return vector_.back(); }
