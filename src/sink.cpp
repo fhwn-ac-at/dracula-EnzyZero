@@ -25,17 +25,17 @@ auto sink_st::level_what_(const spdlog::level::level_enum level) -> std::pair<st
 void ui::sink_st::sink_it_(const spdlog::details::log_msg& msg) {
 
     auto [name, color] = level_what_(msg.level);
+    int used_width = window_.width;
 
     // colour the level
     window_.set_textcolor(color); 
-    window_.sprint(name);
+    window_.print(name);
+    used_width -= name.length();
     window_.rem_textcolor(color);
 
     // print payload
-    if (size_t size = window_.width - name.length(); msg.payload.size() > size)
-        window_.sprint( std::string_view(msg.payload.data(), size) );
-    else
-        window_.sprint(msg.payload.data());
+    window_.print( std::string_view(msg.payload.data(), used_width - 1) );
+    window_.putc('\n');
 
     window_.refresh();
 }

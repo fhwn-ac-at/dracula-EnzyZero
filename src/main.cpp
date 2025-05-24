@@ -10,6 +10,7 @@
 #include "windows.h"
 #include "grid_base.h"
 #include "grid.h"
+#include "streambuf.h"
 
 int main(int nargs, char* args[]) { 
 
@@ -43,7 +44,7 @@ int main(int nargs, char* args[]) {
         static_cast<int>(height * 0.66), // height
         static_cast<int>(width  * 0.66)  // width
     );
-    gridw.make_classic_border();
+    gridw.box();
     gridw.create_subwindow();
     gridw.refresh();
 
@@ -52,7 +53,7 @@ int main(int nargs, char* args[]) {
         width,
         gridw.height
     );
-    logw.make_classic_border();
+    logw.box();
     logw.set_scrollok(true);
     logw.create_subwindow();
     logw.refresh();
@@ -62,7 +63,8 @@ int main(int nargs, char* args[]) {
         width,
         logw.starty + logw.height
     );
-    iow.make_classic_border();
+    iow.box();
+    iow.create_subwindow();
     iow.set_scrollok(true);
     iow.refresh();
 
@@ -72,7 +74,7 @@ int main(int nargs, char* args[]) {
         0,
         gridw.width
     ); 
-    posw.make_classic_border();
+    posw.box();
     posw.refresh();
 
     ui::window stackw (
@@ -81,7 +83,7 @@ int main(int nargs, char* args[]) {
         posw.height,
         posw.startx
     ); 
-    stackw.make_classic_border();
+    stackw.box();
     stackw.refresh();
 
     /*
@@ -93,7 +95,10 @@ int main(int nargs, char* args[]) {
     mainlogger->sinks().clear();
     mainlogger->sinks().emplace_back(log_sink);
 
-    // make grid operator
+    ui::streambuf streamb(*iow.subwindows()[0]);
+    std::iostream nc(&streamb);
 
-    std::cin.get();
+    nc << "Hello World\n" << std::flush;
+ 
+    nc.get();
 }

@@ -73,6 +73,13 @@
         "deque": "cpp",
         "map": "cpp",
         "ranges": "cpp",
-        "*.in": "cpp"
+        "*.in": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "numeric": "cpp",
+        "source_location": "cpp",
+        "iomanip": "cpp",
+        "sstream": "cpp",
+        "__tree": "cpp"
     }
 }

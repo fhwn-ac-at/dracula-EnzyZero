@@ -34,9 +34,6 @@ public:
     template <typename... Args>
     void print(const std::string_view format, Args&&... args);
 
-    template <typename... Args>
-    void sprint(const std::string_view format, Args&&... args);
-
     void putc(const Char c) { ::waddch(window_, c); }
 
     int getc() { return ::wgetch(window_); }
@@ -76,13 +73,6 @@ void ui::window_base::print(const std::string_view format, Args&&... args) {
         
     std::string msg = std::vformat(format, std::make_format_args(args...) ); 
     waddstr(window_, msg.c_str());
-}
-
-template <typename... Args>
-void ui::window_base::sprint(const std::string_view format, Args&&... args) {
-        
-    std::string msg = std::vformat(format, std::make_format_args(args...) ); 
-    waddnstr(window_, msg.c_str(), width); // cut off long outputs
 }
 
 #endif
