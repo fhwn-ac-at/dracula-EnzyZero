@@ -3,7 +3,6 @@
 
 #include <string_view>  
 #include <vector>
-#include <memory>
 #include <ncurses.h>
 #include <utility>
 
@@ -55,14 +54,14 @@ public:
 
 
     void create_subwindow(int height, int width, int starty, int startx) {
-        subwindows_.emplace_back(std::make_unique<subwindow>(*this, height, width, starty, startx)); 
+        subwindows_.emplace_back(*this, height, width, starty, startx); 
     }
 
     void create_subwindow() {
         subwindows_.emplace_back(std::make_unique<subwindow>(*this)); 
     } 
 
-    auto subwindows() -> std::vector<std::unique_ptr<subwindow>>& { return subwindows_; }
+    auto subwindows() -> std::vector<subwindow>& { return subwindows_; }
 
     
     // window owns its window and destroys it
@@ -72,7 +71,7 @@ private:
     window(window& other) = delete;
     window& operator=(window& other) = delete; 
 
-    std::vector<std::unique_ptr<subwindow>> subwindows_;
+    std::vector<subwindow> subwindows_;
 
     using window_base::window_;
 };

@@ -95,7 +95,7 @@ int main(int nargs, char* args[]) {
     mainlogger->sinks().clear();
     mainlogger->sinks().emplace_back(log_sink);
 
-    ui::streambuf streamb(*iow.subwindows()[0]);
+    ui::streambuf streamb(iow.subwindows()[0]);
     std::iostream nc(&streamb);
 
     nc << "Hello World\n" << std::flush;

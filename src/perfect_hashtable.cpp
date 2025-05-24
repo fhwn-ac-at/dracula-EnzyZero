@@ -34,8 +34,6 @@
 #include <string.h>
 
 #define TOTAL_KEYWORDS 31
-#define MIN_WORD_LENGTH 1
-#define MAX_WORD_LENGTH 1
 #define MIN_HASH_VALUE 0
 #define MAX_HASH_VALUE 31
 /* maximum key range = 32, duplicates = 0 */
@@ -71,8 +69,7 @@ perfect_hashtable::hash (const char c)
   return asso_values[static_cast<unsigned char>(c)];
 }
 
-const char
-perfect_hashtable::in_word_set (const char c)
+const char perfect_hashtable::in_word_set (const char c)
 {
   static const char wordlist[] =
     {
@@ -110,7 +107,7 @@ perfect_hashtable::in_word_set (const char c)
       'Q'
     };
 
-    unsigned int key = hash (c);
+    unsigned int key = hash(c);
 
     if (key <= MAX_HASH_VALUE)
         return wordlist[key];

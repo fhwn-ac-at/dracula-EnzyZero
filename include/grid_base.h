@@ -62,7 +62,7 @@ public:
 
     using operator_base::operator_base;
 
-    void render() override;
+    void render(Interpreter& interpreter) override;
 
     ~grid_operator() override = default;
 };

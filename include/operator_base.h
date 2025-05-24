@@ -4,6 +4,7 @@
 #include <memory>
 #include <spdlog/logger.h>
 #include "window_base.h"
+#include "interpreter.h"
 
 namespace ui {
 
@@ -18,7 +19,7 @@ public:
         logger_( logger )
     {}
 
-    virtual void render() = 0;
+    virtual void render(Interpreter& interpreter) = 0;
 
     virtual ~operator_base() = default;
 

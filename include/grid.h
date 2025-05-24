@@ -49,5 +49,7 @@ private:
 
     Grid(Grid& other) = delete;
     Grid& operator=(Grid& other) = delete;
+
+    friend class grid_operator;
 };
 

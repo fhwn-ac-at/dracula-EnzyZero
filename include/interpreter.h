@@ -11,13 +11,15 @@
 class Interpreter {
 public:
 
+    using value_type = long;
+
     Interpreter(
         grid_base& grid, 
         std::istream& istream, 
         std::ostream& ostream, 
         std::shared_ptr<spdlog::logger>& logger
     ) 
-    :   istream_(istream), ostream_(ostream), logger_(logger), coro_(interpret())
+    :   grid_(grid), istream_(istream), ostream_(ostream), logger_(logger), coro_(interpret())
     {}
 
     operator bool() { return !!coro_; }
@@ -29,13 +31,17 @@ public:
     ~Interpreter() = default;
 
 private:
-    Stack<long> stack_;
+    Stack<value_type> stack_;
+    grid_base& grid_;
     std::istream& istream_;
     std::ostream& ostream_;
     std::shared_ptr<spdlog::logger> logger_;
     Coroutine coro_;
 
     Coroutine interpret() { co_return; }
+
+    
+    friend class ui::grid_operator;
 };
 
 
