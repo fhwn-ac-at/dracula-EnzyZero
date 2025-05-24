@@ -34,6 +34,4 @@ concept DerivedOperator = std::is_base_of_v<operator_base, T>;
 
 } // ui namespace
 
-#include "interpreter.h"
-
 #endif
