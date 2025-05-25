@@ -4,7 +4,6 @@
 namespace cmds { 
 namespace stck {
 
-
 code 
 s(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 { 
@@ -143,14 +142,14 @@ p(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
         return err;
     } 
 
-    s.push( s.peek() * grid.catpos( grid.cursor.y-1, grid.cursor.x ) ); 
+    s.peek() *= grid.catpos( grid.cursor.y+1, grid.cursor.x ); 
     return ok;
 }
 
 code 
 P(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 { 
-    if(!below_avail(grid)) 
+    if(!above_avail(grid)) 
     {
         log->error("BAD::CELL::ACCESS cannot access value above");
         return err;
@@ -161,7 +160,7 @@ P(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
         return err;
     } 
 
-    s.push( s.peek() * grid.catpos( grid.cursor.y+1, grid.cursor.x ) ); 
+    s.peek() *= grid.catpos( grid.cursor.y-1, grid.cursor.x ); 
     return ok;
 }
 
@@ -179,14 +178,14 @@ q(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
         return err; 
     } 
 
-    s.push( s.peek() / grid.catpos( grid.cursor.y-1, grid.cursor.x ) ); 
+    s.peek() /= grid.catpos( grid.cursor.y+1, grid.cursor.x ); 
     return ok;
 }
 
 code 
 Q(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 { 
-    if(!below_avail(grid)) 
+    if(!above_avail(grid)) 
     {
         log->error("BAD::CELL::ACCESS cannot access value above");
         return err;
@@ -197,7 +196,7 @@ Q(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
         return err;
     } 
 
-    s.push( s.peek() / grid.catpos( grid.cursor.y+1, grid.cursor.x ) ); 
+    s.peek() /= grid.catpos( grid.cursor.y-1, grid.cursor.x ); 
     return ok;
 }
 
@@ -215,14 +214,14 @@ m(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
         return err; 
     } 
 
-    s.push( s.peek() % grid.catpos( grid.cursor.y-1, grid.cursor.x ) ); 
+    s.peek() %= grid.catpos( grid.cursor.y+1, grid.cursor.x ); 
     return ok;
 }
 
 code 
 M(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 { 
-    if(!below_avail(grid)) 
+    if(!above_avail(grid)) 
     {
         log->error("BAD::CELL::ACCESS cannot access value above");
         return err;
@@ -233,7 +232,7 @@ M(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
         return err;
     } 
 
-    s.push( s.peek() % grid.catpos( grid.cursor.y+1, grid.cursor.x ) ); 
+    s.peek() %= grid.catpos( grid.cursor.y-1, grid.cursor.x ); 
     return ok;
 }
 
