@@ -5,7 +5,9 @@
 
 template <typename T>
 class stack {
-public:
+public: 
+
+    using value_type = T;
 
     T& peek() { return vector_.back(); }
     void push(T&& val) { vector_.emplace_back( val ); }

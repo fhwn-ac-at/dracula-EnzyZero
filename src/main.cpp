@@ -5,6 +5,7 @@
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+#include "interpreter.h"
 #include "sink.h"
 #include "start_ncurses.h"
 #include "windows.h"
@@ -90,15 +91,24 @@ int main(int nargs, char* args[]) {
      * Now that we have ourselves some windows, we cannot print to stdout anymore.
      * A special sink will be used which prints to the "logw" window.
      * Swap the sinks in the mainlogger to now print to the log window.
+     * 
+     * Also, a special streambuf will be created to print to the io window instead of to stdout/in. 
+     * This allows for still using the std::iostream classes.
      */
     auto log_sink = std::make_shared<ui::sink_st>( logw );
     mainlogger->sinks().clear();
     mainlogger->sinks().emplace_back(log_sink);
 
     ui::streambuf streamb(iow.subwindows()[0]);
-    std::iostream nc(&streamb);
+    std::iostream nc(&streamb); 
 
-    nc << "Hello World\n" << std::flush;
+    /**
+     * Now the interpreter will be started along with the operators which 
+     * print information to the windows.
+     */
+
+    
+    
  
     nc.get();
 }

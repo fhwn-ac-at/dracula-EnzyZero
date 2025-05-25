@@ -32,7 +32,7 @@ public:
 
 
     /// @details these members are public for derivatives of operator_base
-    stack<long> stack_;
+    stack<char> stack_;
     grid_base& grid_;
 
 private:

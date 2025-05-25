@@ -5,19 +5,17 @@
 
 unsigned call_count = 0;
 
-commands::error func(grid_base& grid, stack<commands::stack_value_type>& stack, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& logger) {
+cmds::code func(grid_base& grid, stack<cmds::stack_value_type>& stack, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& logger) {
     call_count++;
-    return commands::ok;
+    return cmds::ok;
 }
 
 TEST(HashTable, Basic) {
 
-    std::function<commands::signature> cb = func;
+    std::function<cmds::signature> cb = func;
     grid_base grd;
-    stack<commands::stack_value_type> s;
-
-    auto null_sink = std::make_shared<spdlog::sinks::null_sink_st>();
-    auto logger = std::make_shared<spdlog::logger>("null_logger", null_sink);
+    stack<cmds::stack_value_type> s;
+    auto logger = spdlog::null_logger_st("nolog");
 
     auto test = [&](){
 
@@ -55,7 +53,7 @@ TEST(HashTable, Basic) {
             {'Q', cb }
         };
 
-        using namespace commands;
+        using namespace cmds;
 
         EXPECT_EQ(hasht('a', grd, s, std::cin, std::cout, logger), ok);
         EXPECT_EQ(hasht('l', grd, s, std::cin, std::cout, logger), ok);
@@ -65,7 +63,7 @@ TEST(HashTable, Basic) {
         EXPECT_EQ(hasht('m', grd, s, std::cin, std::cout, logger), ok);
         EXPECT_EQ(hasht('k', grd, s, std::cin, std::cout, logger), ok);
 
-        EXPECT_EQ(hasht('c', grd, s, std::cin, std::cout, logger), invalid_char);
+        EXPECT_EQ(hasht('c', grd, s, std::cin, std::cout, logger), miss);
 
         EXPECT_EQ(call_count, 7);
     };

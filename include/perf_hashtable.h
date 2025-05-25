@@ -15,22 +15,23 @@
 class perf_hashtable {
 public: 
 
-    perf_hashtable(std::initializer_list<std::pair<char, std::function<commands::signature>>> list)
+    perf_hashtable(std::initializer_list<std::pair<char, std::function<cmds::signature>>> list)
     :   commands_(to_array(list))
     {}
 
-    commands::error operator()(
+    cmds::code operator()(
         const char c, 
         grid_base& grid, 
-        stack<commands::stack_value_type>& stack, 
+        stack<cmds::stack_value_type>& stack, 
         std::istream& istream, 
         std::ostream& ostream, 
         std::shared_ptr<spdlog::logger>& logger 
     ) 
-    const noexcept 
+    const
     { 
+        // exec command at key's position
         const unsigned key = hash(c);
-        return key > MAX_HASH_VALUE ? commands::invalid_char : commands_[key](grid, stack, istream, ostream, logger);
+        return key > MAX_HASH_VALUE ? cmds::miss : commands_[key](grid, stack, istream, ostream, logger);
     }
 
 private:
@@ -39,11 +40,11 @@ private:
     static constexpr int MIN_HASH_VALUE = 0;
     static constexpr int MAX_HASH_VALUE = 30; 
 
-    const std::array<std::function<commands::signature>, TOTAL_KEYWORDS> commands_; 
+    const std::array<std::function<cmds::signature>, TOTAL_KEYWORDS> commands_; 
 
     static const bool in_word_set(const char c); 
     static const unsigned hash(const char c);
-    static auto to_array(std::initializer_list<std::pair<char, std::function<commands::signature>>> list) -> std::array<std::function<commands::signature>, TOTAL_KEYWORDS>; 
+    static auto to_array(std::initializer_list<std::pair<char, std::function<cmds::signature>>> list) -> std::array<std::function<cmds::signature>, TOTAL_KEYWORDS>; 
 }; 
 
 #endif
