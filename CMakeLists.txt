@@ -53,7 +53,7 @@ if(TESTING)
     file(GLOB TEST_SOURCES ${TESTDIR}/*.cpp)
     list(APPEND SOURCES ${TEST_SOURCES}) 
 
-    add_executable(test_dracula ${SOURCES})
+    add_executable(test_dracula ${TEST_SOURCES})
     target_include_directories(test_dracula PRIVATE ${INCLUDEDIR})
 
     target_link_libraries(test_dracula PRIVATE
