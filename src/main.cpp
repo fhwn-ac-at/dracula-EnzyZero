@@ -1,6 +1,7 @@
 #include <iostream>
 #include <chrono>
-#include <memory>
+#include <memory> 
+#include <functional>
 
 #include <spdlog/logger.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -8,32 +9,37 @@
 #include "interpreter.h"
 #include "sink.h"
 #include "start_ncurses.h"
-#include "windows.h"
-#include "grid_base.h"
+#include "windows.h" 
+#include "perf_hashtable.h"
 #include "grid.h"
 #include "streambuf.h"
 
 int main(int nargs, char* args[]) { 
 
-    // Creating loggers and a coloured sink for logging to terminal. 
-    auto terminal_sink = std::make_shared<spdlog::sinks::stdout_color_sink_st>();
-    auto mainlogger = std::make_shared<spdlog::logger>("mainlogger", terminal_sink);
+    /**
+     * 1. Creating a logger for coloured output. 
+     * 2. Boilerplate args checking
+     * 3. Creating the grid from file.
+     */
+    std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_st("console");
 
     if (nargs != 2)
     {
-        mainlogger->error("No filename passed.");
-        mainlogger->info("Usage: out <filename>");
+        logger->error("No filename passed.");
+        logger->info("Usage: out <filename>");
         return 1;
     }
 
     // read data from file and create a grid
-    Grid grid(args[1], mainlogger);
+    Grid grid(args[1], logger);
     if (!grid)
         return 1;
 
     /**
      *  Now, ncurses will be started.
-     *  The windows will be created as well as some settings tweaked to make them pretty and useful :)
+     *  The windows will be created as well as some settings tweaked to make them pretty and useful :) 
+     *  The ncurses obj only really only exists for calling endwin() in its destructor.
+     *  It also holds a window_base "mainwin" which is the standard screen.
      */  
     ui::ncurses start{};
 
@@ -93,22 +99,72 @@ int main(int nargs, char* args[]) {
      * Swap the sinks in the mainlogger to now print to the log window.
      * 
      * Also, a special streambuf will be created to print to the io window instead of to stdout/in. 
-     * This allows for still using the std::iostream classes.
+     * Ncurses captures normal iostreams and provides its own wrapper. 
+     * 
+     * The last ingredient is the hashtable, which will be initalised with the commands.
      */
     auto log_sink = std::make_shared<ui::sink_st>( logw );
-    mainlogger->sinks().clear();
-    mainlogger->sinks().emplace_back(log_sink);
-
+    logger->sinks().clear();
+    logger->sinks().emplace_back(log_sink);
+ 
+    // streambuf
     ui::streambuf streamb(iow.subwindows()[0]);
-    std::iostream nc(&streamb); 
+    std::iostream nc(&streamb);   
+
+    using namespace cmds::flow;
+    using namespace cmds::stck;
+    using namespace cmds::io;
+
+    // you may guess  
+    perf_hashtable<std::function<cmds::signature>> 
+    hasht
+    { 
+        {'e', e },
+        {'x', x },
+        {'X', X },
+        {'p', p },
+        {'P', P },
+        {'d', d },
+        {'D', D },
+        {'h', h },
+        {'H', H },
+        {'o', o },
+        {'O', O },
+        {'R', R },
+        {'r', r },
+        {'f', f },
+        {'F', F },
+        {'j', j },
+        {'J', J },
+        {'i', i },
+        {'I', I },
+        {'l', l },
+        {'L', L },
+        {'s', s },
+        {'S', S },
+        {'a', a },
+        {'A', A },
+        {'k', k },
+        {'K', K },
+        {'m', m },
+        {'M', M },
+        {'q', q },
+        {'Q', Q }
+    }; 
 
     /**
-     * Now the interpreter will be started along with the operators which 
-     * print information to the windows.
-     */
+     * 1. Make the interpreter and pass resources
+     * 2. Run it again and again with a delay
+     * 3. If its done, its done  
+     */ 
 
-    
-    
- 
-    nc.get();
+    Interpreter interpreter(grid, hasht, std::cin, std::cout, logger); 
+
+    // TODO operators missing
+  
+    while (!interpreter.done())   
+    {
+        std::this_thread::sleep_for( std::chrono::milliseconds(500) ); 
+        interpreter.resume();
+    }
 }
