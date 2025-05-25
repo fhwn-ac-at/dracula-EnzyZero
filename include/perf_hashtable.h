@@ -1,6 +1,7 @@
 #ifndef perfect_hashtable_h
 #define perfect_hashtable_h 
 
+#include <expected>
 #include <functional>
 #include <array> 
 #include <initializer_list>
@@ -11,27 +12,25 @@
 #include "grid_base.h"
 #include "stack.h"
 
- 
+template <typename T> 
 class perf_hashtable {
 public: 
 
-    perf_hashtable(std::initializer_list<std::pair<char, std::function<cmds::signature>>> list)
-    :   commands_(to_array(list))
-    {}
 
-    cmds::code operator()(
-        const char c, 
-        grid_base& grid, 
-        stack<cmds::stack_value_type>& stack, 
-        std::istream& istream, 
-        std::ostream& ostream, 
-        std::shared_ptr<spdlog::logger>& logger 
-    ) 
-    const
-    { 
-        // exec command at key's position
-        const unsigned key = hash(c);
-        return key > MAX_HASH_VALUE ? cmds::miss : commands_[key](grid, stack, istream, ostream, logger);
+    perf_hashtable(std::initializer_list<std::pair<char, T>> list)
+    :   values_(to_array(list))
+    {}  
+
+
+    struct table_miss{}; // error flag 
+
+    auto at(const char c) -> std::expected<T&, table_miss>
+    {  
+        unsigned key = hash(c);
+        if (key > MAX_HASH_VALUE)
+            return std::unexpected();
+
+        return values_[key];
     }
 
 private:
@@ -40,11 +39,13 @@ private:
     static constexpr int MIN_HASH_VALUE = 0;
     static constexpr int MAX_HASH_VALUE = 30; 
 
-    const std::array<std::function<cmds::signature>, TOTAL_KEYWORDS> commands_; 
+    const std::array<T, TOTAL_KEYWORDS> values_; 
 
     static const bool in_word_set(const char c); 
     static const unsigned hash(const char c);
-    static auto to_array(std::initializer_list<std::pair<char, std::function<cmds::signature>>> list) -> std::array<std::function<cmds::signature>, TOTAL_KEYWORDS>; 
-}; 
+    static auto to_array(std::initializer_list<std::pair<char, T>> list) -> std::array<T, TOTAL_KEYWORDS>; 
+};  
+
+#include "perf_hashtable_impl.h"
 
 #endif
