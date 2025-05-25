@@ -1,7 +1,8 @@
 #ifndef commands_h
 #define commands_h 
 
-#include <functional> 
+#include <functional>  
+#include <stdint.h>
 #include <iostream>
 #include <memory>
 #include <spdlog/logger.h>
@@ -10,7 +11,7 @@
  
 namespace cmds { 
 
-    enum code : int {
+    enum code : uint8_t {
         ok,
         err,
         end
@@ -30,6 +31,8 @@ namespace cmds {
         code J(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
         code K(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
         code L(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code x(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code X(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
         code e(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
     }
 

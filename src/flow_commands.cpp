@@ -111,6 +111,48 @@ K(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
     } 
 
     return ok;
+} 
+
+code 
+x(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+{
+    if (s.empty())
+    {
+        log->error("STACK::IS::EMPTY no values in stack"); 
+        return err;
+    } 
+    else if (grid.cursor.dir == grid_base::Cursor::NONE) 
+    {
+        log->error("NO::DIRECTION::ERROR cannot turn without an initial direction"); 
+        return err;
+    } 
+  
+    // turn clockwise if top is positive
+    if(s.peek() > 0)
+        grid.cursor.dir = grid_base::Cursor::cw( grid.cursor.dir );
+
+    return ok;
+} 
+
+code 
+X(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+{
+    if (s.empty())
+    {
+        log->error("STACK::IS::EMPTY no values in stack"); 
+        return err;
+    } 
+    else if (grid.cursor.dir == grid_base::Cursor::NONE) 
+    {
+        log->error("NO::DIRECTION::ERROR cannot turn without an initial direction"); 
+        return err;
+    } 
+  
+    // turn anticlockwise if top is negative
+    if(s.peek() < 0)
+        grid.cursor.dir = grid_base::Cursor::ccw( grid.cursor.dir );
+
+    return ok;
 }
 
 code 

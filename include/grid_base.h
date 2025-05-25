@@ -1,7 +1,8 @@
 #ifndef grid_base_h
 #define grid_base_h
 
-#include <array>
+#include <array> 
+#include <stdint.h>
 #include <spdlog/logger.h>
 
 class grid_base {
@@ -12,14 +13,23 @@ public:
     struct Cursor {
         int y{};
         int x{};
+ 
+        /// @warning ORDER MATTERS!
+        enum direction : uint8_t {
+            NONE  = 0,
+            UP    = 1,
+            RIGHT = 2,
+            DOWN  = 3,
+            LEFT  = 4
+        }; 
 
-        enum direction : int {
-            NONE,
-            UP,
-            DOWN,
-            RIGHT,
-            LEFT
-        };
+        static constexpr direction cw(direction dir)  {
+            return static_cast<direction>(1 + (dir % 4));
+        } 
+
+        static constexpr direction ccw(direction dir) {
+            return static_cast<direction>(1 + (5 + (dir - 2)) % 4);
+        }
 
         direction dir{NONE};
     };
