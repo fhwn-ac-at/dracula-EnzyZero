@@ -10,7 +10,7 @@ public:
     using value_type = T;
 
     T& peek() { return vector_.back(); }
-    void push(T&& val) { vector_.emplace_back( val ); }
+    void push(auto&& val) { vector_.emplace_back( val ); }
     T pop() { return *vector_.erase( vector_.end() - 1 ); }
 
     template <typename... Args>

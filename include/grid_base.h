@@ -26,19 +26,9 @@ public:
 
     Cursor cursor{}; 
 
-    /**
-     * @brief safe get char at current cursor value in the grid
-     * 
-     * @return char& char at cur
-     */
-    virtual char& catcurs() { return grid_.at(cursor.y).at(cursor.x); }
+    char& catcur() { return grid_.at(cursor.y).at(cursor.x); }
 
-    /**
-     * @brief unsafe get char at current cursor value in the grid
-     * 
-     * @return char& cahr at cur
-     */
-    virtual char& catcur() noexcept { return grid_[cursor.y][cursor.x]; }
+    char& catpos(const unsigned y, const unsigned x) { return grid_.at(y).at(x); } 
 
     virtual ~grid_base() = default;
 

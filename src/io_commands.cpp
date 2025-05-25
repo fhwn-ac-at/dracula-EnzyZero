@@ -1,0 +1,73 @@
+#include "commands.h" 
+
+namespace cmds {
+namespace io {
+
+code 
+o(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+{
+    if(!below_avail(grid))
+    {
+        log->error("BAD::CELL::ACCESS cannot send value below"); 
+        return err;
+    }
+
+    os << grid.catpos( grid.cursor.y+1, grid.cursor.x ) << std::flush; // flush calls wrefresh for ncurses
+    return ok;
+} 
+
+code 
+O(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+{
+    if(!above_avail(grid))
+    {
+        log->error("BAD::CELL::ACCESS cannot send value above"); 
+        return err;
+    }
+
+    os << grid.catpos( grid.cursor.y-1, grid.cursor.x ) << std::flush; // flush calls wrefresh for ncurses
+    return ok;
+} 
+
+code 
+i(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+{
+    if(!below_avail(grid))
+    {
+        log->error("BAD::CELL::ACCESS no cell below to store to"); 
+        return err;
+    }
+ 
+    // get input
+    log->info("Need input...");  
+    char c;
+    is >> c;
+ 
+    log->info("Got input (hex): 0x{:02X}", c); 
+    grid.catpos( grid.cursor.y+1, grid.cursor.x ) = c;   
+
+    return ok;
+} 
+
+code 
+I(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+{
+    if(!above_avail(grid))
+    {
+        log->error("BAD::CELL::ACCESS no cell above to store to"); 
+        return err;
+    }
+ 
+    // get input
+    log->info("Need input...");  
+    char c;
+    is >> c;
+ 
+    log->info("Got input (hex): 0x{:02X}", c); 
+    grid.catpos( grid.cursor.y-1, grid.cursor.x ) = c;   
+
+    return ok;
+}
+
+} // io namespace
+} // cmds namespace
