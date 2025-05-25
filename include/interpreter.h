@@ -2,6 +2,7 @@
 #define interpreter_h 
 
 #include <iostream>
+#include <functional>
 #include <spdlog/logger.h>
 #include <memory>
 #include "grid_base.h"
@@ -14,7 +15,7 @@ public:
 
     Interpreter(
         grid_base& grid,  
-        const perf_hashtable& hasht,
+        const perf_hashtable<std::function<cmds::signature>>& hasht,
         std::istream& istream, 
         std::ostream& ostream, 
         std::shared_ptr<spdlog::logger>& logger
@@ -36,13 +37,13 @@ public:
     grid_base& grid_;
 
 private:
-    const perf_hashtable& hasht_;
+    const perf_hashtable<std::function<cmds::signature>>& hasht_;
     std::ostream& ostream_;
     std::istream& istream_;
     std::shared_ptr<spdlog::logger> logger_; 
 
     Coroutine coro_;
-    Coroutine interpret() { co_return; }
+    Coroutine interpret(); 
 };
 
 #endif
