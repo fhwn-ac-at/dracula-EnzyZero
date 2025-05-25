@@ -3,7 +3,7 @@
 #include <memory>
 #include "grid_base.h"
 
-class Grid : public grid_base {
+class Grid : public Grid_base {
 public:
 
     /**
@@ -29,10 +29,6 @@ public:
      */
     operator bool() { return !file_.fail(); } 
 
-    // get the caracter at the current cursors value (inherited from grid_base)
-    using grid_base::catcur;
-    using grid_base::catcurs;
-
     /**
      * @brief access to the underlying grid_ stack arrays
      * 
@@ -49,7 +45,5 @@ private:
 
     Grid(Grid& other) = delete;
     Grid& operator=(Grid& other) = delete;
-
-    friend class grid_operator;
 };
 

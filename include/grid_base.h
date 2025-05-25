@@ -1,49 +1,30 @@
 #ifndef grid_base_h
 #define grid_base_h
 
-#include <array> 
+#include <array>
 #include <stdint.h>
 #include <spdlog/logger.h>
+#include "cursor.h"
 
-class grid_base {
+class Grid_base
+{
 public:
+    Cursor cursor{};
 
-    grid_base() = default;
+    Grid_base() = default;
 
-    struct Cursor {
-        int y{};
-        int x{};
- 
-        /// @warning ORDER MATTERS!
-        enum direction : uint8_t {
-            NONE  = 0,
-            UP    = 1,
-            RIGHT = 2,
-            DOWN  = 3,
-            LEFT  = 4
-        }; 
+    char &catcur() { return grid_.at(cursor.y).at(cursor.x); }
 
-        static constexpr direction cw(direction dir)  {
-            return static_cast<direction>(1 + (dir % 4));
-        } 
+    char &catpos(const unsigned y, const unsigned x) { return grid_.at(y).at(x); } 
 
-        static constexpr direction ccw(direction dir) {
-            return static_cast<direction>(1 + (5 + (dir - 2)) % 4);
-        }
+    virtual ~Grid_base() = default;
 
-        direction dir{NONE};
-    };
+protected:
+    // matrix with height=42 and width=69, very sus 
+    std::array<std::array<char, 69>, 42> grid_{};   
 
-    Cursor cursor{}; 
-
-    char& catcur() { return grid_.at(cursor.y).at(cursor.x); }
-
-    char& catpos(const unsigned y, const unsigned x) { return grid_.at(y).at(x); } 
-
-    virtual ~grid_base() = default;
-
-    // matrix with height=42 and width=69, very sus
-    std::array<std::array<char, 69>, 42> grid_{};
+public:
+    auto matrix() -> decltype(grid_)&  { return grid_; }
 };
 
 #endif
