@@ -13,7 +13,6 @@ namespace cmds {
     enum code : int {
         ok,
         err,
-        miss, // hash table miss
         end
     };
 
