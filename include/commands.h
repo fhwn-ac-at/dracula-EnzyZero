@@ -61,8 +61,12 @@ namespace cmds {
         code I(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
     }
 
+    inline bool at_left(grid_base& grid)     { return grid.cursor.x <= 0; }
+    inline bool at_right(grid_base& grid)    { return grid.cursor.x >= grid.grid_.at(grid.cursor.x).size() -1; } 
+    inline bool at_top(grid_base& grid)      { return grid.cursor.y <= 0; }
+    inline bool at_bot(grid_base& grid)      { return grid.cursor.y >= grid.grid_.at(grid.cursor.y).size() -1; } 
     inline bool above_avail(grid_base& grid) { return grid.cursor.y > 0; }
-    inline bool below_avail(grid_base& grid) { return grid.cursor.y < grid.grid_.size() -1; }
+    inline bool below_avail(grid_base& grid) { return grid.cursor.y < grid.grid_.size() -1; } 
 }
 
 #endif

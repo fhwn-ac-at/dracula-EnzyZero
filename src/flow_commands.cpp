@@ -3,23 +3,11 @@
 namespace cmds {
 namespace flow {
 
-namespace // make local
-{
-    bool at_left(grid_base& grid)   { return grid.cursor.x <= 0; }
-    bool at_right(grid_base& grid)  { return grid.cursor.x >= grid.grid_.at(grid.cursor.x).size() -1; } 
-    bool at_top(grid_base& grid)    { return grid.cursor.y <= 0; }
-    bool at_bot(grid_base& grid)    { return grid.cursor.y >= grid.grid_.at(grid.cursor.y).size() -1; } 
-}
+
 
 code 
 h(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log)
 {  
-    if (at_left(grid))
-    {
-        log->error("BAD::MOVE::ERROR cannot move left");
-        return err;
-    }
-
     grid.cursor.dir = grid_base::Cursor::LEFT;
     return ok;
 }
@@ -28,12 +16,6 @@ h(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
 code 
 j(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
-    if (at_bot(grid))
-    {
-        log->error("BAD::MOVE::ERROR cannot move down");
-        return err;
-    }
-    
     grid.cursor.dir = grid_base::Cursor::DOWN;
     return ok;
 }
@@ -41,12 +23,6 @@ j(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
 code 
 k(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
-    if (at_top(grid))
-    {
-        log->error("BAD::MOVE::ERROR cannot move up");
-        return err;
-    }
-
     grid.cursor.dir = grid_base::Cursor::UP;
     return ok;
 }
@@ -55,12 +31,6 @@ k(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
 code 
 l(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
-    if (at_right(grid))
-    {
-        log->error("BAD::MOVE::ERROR cannot move right");
-        return err;
-    }
-
     grid.cursor.dir = grid_base::Cursor::RIGHT;
     return ok;
 }
@@ -73,11 +43,6 @@ H(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
         log->error("STACK::IS::EMPTY no values in the stack");
         return err;
     } 
-    else if (at_left(grid))
-    {
-        log->error("BAD::MOVE::ERROR cannot move left");
-        return err;
-    }
 
     grid.cursor.dir = grid_base::Cursor::LEFT; 
     const auto stackval = s.peek();
@@ -104,11 +69,6 @@ J(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
         log->error("STACK::IS::EMPTY no values in the stack");
         return err;
     } 
-    else if (at_bot(grid))
-    {
-        log->error("BAD::MOVE::ERROR cannot move down");
-        return err;
-    }
 
     grid.cursor.dir = grid_base::Cursor::DOWN; 
     const auto stackval = s.peek();
@@ -135,11 +95,6 @@ K(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
         log->error("STACK::IS::EMPTY no values in the stack");
         return err;
     } 
-    else if (at_top(grid))
-    {
-        log->error("BAD::MOVE::ERROR cannot move up");
-        return err;
-    }
 
     grid.cursor.dir = grid_base::Cursor::UP; 
     const auto stackval = s.peek();
@@ -166,11 +121,6 @@ L(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
         log->error("STACK::IS::EMPTY no values in the stack");
         return err;
     } 
-    else if (at_right(grid))
-    {
-        log->error("BAD::MOVE::ERROR cannot move right");
-        return err;
-    }
 
     grid.cursor.dir = grid_base::Cursor::RIGHT; 
     const auto stackval = s.peek();

@@ -1,4 +1,5 @@
-#include <expected>
+#include <expected> 
+
 #include "interpreter.h" 
 
 Coroutine Interpreter::interpret() 
@@ -24,7 +25,7 @@ Coroutine Interpreter::interpret()
         if (cmds::code res = cmd(grid_, stack_, istream_, ostream_, logger_); res != cmds::ok)  
             co_return;
 
-        // step to direction (cmds check if step is possible) 
+        // step to direction and check if possible
         using enum grid_base::Cursor::direction;
         switch (grid_.cursor.dir)
         {
@@ -32,12 +33,44 @@ Coroutine Interpreter::interpret()
                 logger_->error("NO::DIRECTION::ERROR no direction to step to next.");
                 co_return; 
 
-            case UP:    grid_.cursor.y--; break;
-            case DOWN:  grid_.cursor.y++; break; 
-            case LEFT:  grid_.cursor.x--; break;
-            case RIGHT: grid_.cursor.x++; break;
+            case UP:     
+                if (cmds::at_top(grid_))  
+                {
+                    logger_->error("BAD::MOVE::ERROR cannot move up");
+                    co_return;
+                }
+                grid_.cursor.y--; 
+                break; 
 
-            default: std::unreachable();
+            case DOWN:   
+                if (cmds::at_bot(grid_))  
+                {
+                    logger_->error("BAD::MOVE::ERROR cannot move down");
+                    co_return;
+                }
+                grid_.cursor.y++; 
+                break;  
+
+            case LEFT:     
+                if (cmds::at_left(grid_))  
+                {
+                    logger_->error("BAD::MOVE::ERROR cannot move left");
+                    co_return;
+                }
+                grid_.cursor.x--; 
+                break; 
+
+            case RIGHT:   
+                if (cmds::at_right(grid_))  
+                {
+                    logger_->error("BAD::MOVE::ERROR cannot move right");
+                    co_return;
+                } 
+                grid_.cursor.x++; 
+                break;
+
+            default: 
+                std::unreachable();
         } 
   
         // suspend here
