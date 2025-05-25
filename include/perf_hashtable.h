@@ -1,6 +1,7 @@
 #ifndef perfect_hashtable_h
 #define perfect_hashtable_h 
 
+#include <functional>
 #include <array> 
 #include <initializer_list>
 #include <utility>
@@ -14,7 +15,7 @@
 class perf_hashtable {
 public: 
 
-    perf_hashtable(std::initializer_list<std::pair<char, commands::signature>> list)
+    perf_hashtable(std::initializer_list<std::pair<char, std::function<commands::signature>>> list)
     :   commands_(to_array(list))
     {}
 
@@ -38,11 +39,11 @@ private:
     static constexpr int MIN_HASH_VALUE = 0;
     static constexpr int MAX_HASH_VALUE = 30; 
 
-    const std::array<commands::signature, TOTAL_KEYWORDS> commands_; 
+    const std::array<std::function<commands::signature>, TOTAL_KEYWORDS> commands_; 
 
     static const bool in_word_set(const char c); 
     static const unsigned hash(const char c);
-    static auto to_array(std::initializer_list<std::pair<char, commands::signature>> list) -> std::array<commands::signature, TOTAL_KEYWORDS>; 
+    static auto to_array(std::initializer_list<std::pair<char, std::function<commands::signature>>> list) -> std::array<std::function<commands::signature>, TOTAL_KEYWORDS>; 
 }; 
 
 #endif

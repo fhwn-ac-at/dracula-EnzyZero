@@ -18,7 +18,7 @@ namespace commands {
 
     using stack_value_type = long;
 
-    using signature = std::function<error(grid_base&, stack<stack_value_type>&, std::istream&, std::ostream&, std::shared_ptr<spdlog::logger>&)>;
+    using signature = error(grid_base&, stack<stack_value_type>&, std::istream&, std::ostream&, std::shared_ptr<spdlog::logger>&);
 };
 
 #endif

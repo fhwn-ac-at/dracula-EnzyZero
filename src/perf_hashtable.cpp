@@ -66,13 +66,13 @@ const bool perf_hashtable::in_word_set (const char c)
     return false;
 }
 
-auto perf_hashtable::to_array(std::initializer_list<std::pair<char, commands::signature>> list) -> std::array<commands::signature, TOTAL_KEYWORDS> 
+auto perf_hashtable::to_array(std::initializer_list<std::pair<char, std::function<commands::signature>>> list) -> std::array<std::function<commands::signature>, TOTAL_KEYWORDS> 
 {
     if (list.size() != TOTAL_KEYWORDS)
         throw std::range_error("initalizer list must be equal to MAX_HASH_VALUE");
  
     // make a temp array and copy list contents into it
-    std::array<commands::signature, TOTAL_KEYWORDS> arr{}; 
+    std::array<std::function<commands::signature>, TOTAL_KEYWORDS> arr{}; 
 
     for (auto& pair : list) 
     { 

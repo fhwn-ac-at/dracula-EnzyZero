@@ -12,7 +12,7 @@ commands::error func(grid_base& grid, stack<commands::stack_value_type>& stack, 
 
 TEST(HashTable, Basic) {
 
-    commands::signature cb = func;
+    std::function<commands::signature> cb = func;
     grid_base grd;
     stack<commands::stack_value_type> s;
 
