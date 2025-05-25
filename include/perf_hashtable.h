@@ -24,7 +24,7 @@ public:
 
     struct table_miss{}; // error flag 
 
-    auto at(const char c) -> std::expected<T&, table_miss>
+    auto at(const char c) const -> std::expected<T&, table_miss>
     {  
         unsigned key = hash(c);
         if (key > MAX_HASH_VALUE)
