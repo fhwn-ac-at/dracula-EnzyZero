@@ -116,7 +116,7 @@ int main(int nargs, char* args[]) {
     using namespace cmds::io;
 
     // you may guess  
-    perf_hashtable<std::function<cmds::signature>> 
+    PerfHashtable<std::function<cmds::signature>> 
     hasht
     { 
         {'e', e },
@@ -164,7 +164,7 @@ int main(int nargs, char* args[]) {
   
     while (!interpreter.done())   
     {
-        std::this_thread::sleep_for( std::chrono::milliseconds(500) ); 
         interpreter.resume();
+        std::this_thread::sleep_for( std::chrono::milliseconds(500) ); 
     }
 }

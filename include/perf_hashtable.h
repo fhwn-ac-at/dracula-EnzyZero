@@ -13,14 +13,12 @@
 #include "stack.h"
 
 template <typename T> 
-class perf_hashtable {
+class PerfHashtable {
 public: 
 
-
-    perf_hashtable(std::initializer_list<std::pair<char, T>> list)
+    PerfHashtable(std::initializer_list<std::pair<char, T>> list)
     :   values_(to_array(list))
     {}  
-
 
     struct table_miss{}; // error flag 
 

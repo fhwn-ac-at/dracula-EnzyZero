@@ -6,37 +6,37 @@ namespace flow {
 
 
 code 
-h(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log)
+h(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log)
 {  
-    grid.cursor.dir = grid_base::Cursor::LEFT;
+    grid.cursor.dir = Cursor::LEFT;
     return ok;
 }
 
 
 code 
-j(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+j(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
-    grid.cursor.dir = grid_base::Cursor::DOWN;
+    grid.cursor.dir = Cursor::DOWN;
     return ok;
 }
 
 code 
-k(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+k(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
-    grid.cursor.dir = grid_base::Cursor::UP;
+    grid.cursor.dir = Cursor::UP;
     return ok;
 }
 
 
 code 
-l(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+l(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
-    grid.cursor.dir = grid_base::Cursor::RIGHT;
+    grid.cursor.dir = Cursor::RIGHT;
     return ok;
 }
 
 code 
-H(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+H(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
     if (s.empty()) 
     {
@@ -44,7 +44,7 @@ H(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
         return err;
     } 
 
-    grid.cursor.dir = grid_base::Cursor::LEFT; 
+    grid.cursor.dir = Cursor::LEFT; 
     const auto stackval = s.peek();
 
     do {
@@ -62,7 +62,7 @@ H(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
 }
 
 code 
-J(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+J(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
     if (s.empty()) 
     {
@@ -70,7 +70,7 @@ J(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
         return err;
     } 
 
-    grid.cursor.dir = grid_base::Cursor::DOWN; 
+    grid.cursor.dir = Cursor::DOWN; 
     const auto stackval = s.peek();
 
     do {
@@ -88,7 +88,7 @@ J(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
 } 
 
 code 
-K(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+K(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
     if (s.empty()) 
     {
@@ -96,7 +96,7 @@ K(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
         return err;
     } 
 
-    grid.cursor.dir = grid_base::Cursor::UP; 
+    grid.cursor.dir = Cursor::UP; 
     const auto stackval = s.peek();
 
     do {
@@ -114,14 +114,14 @@ K(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
 } 
 
 code 
-x(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+x(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
     if (s.empty())
     {
         log->error("STACK::IS::EMPTY no values in stack"); 
         return err;
     } 
-    else if (grid.cursor.dir == grid_base::Cursor::NONE) 
+    else if (grid.cursor.dir == Cursor::NONE) 
     {
         log->error("NO::DIRECTION::ERROR cannot turn without an initial direction"); 
         return err;
@@ -129,20 +129,20 @@ x(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
   
     // turn clockwise if top is positive
     if(s.peek() > 0)
-        grid.cursor.dir = grid_base::Cursor::cw( grid.cursor.dir );
+        grid.cursor.dir = Cursor::cw( grid.cursor.dir );
 
     return ok;
 } 
 
 code 
-X(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+X(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
     if (s.empty())
     {
         log->error("STACK::IS::EMPTY no values in stack"); 
         return err;
     } 
-    else if (grid.cursor.dir == grid_base::Cursor::NONE) 
+    else if (grid.cursor.dir == Cursor::NONE) 
     {
         log->error("NO::DIRECTION::ERROR cannot turn without an initial direction"); 
         return err;
@@ -150,13 +150,13 @@ X(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
   
     // turn anticlockwise if top is negative
     if(s.peek() < 0)
-        grid.cursor.dir = grid_base::Cursor::ccw( grid.cursor.dir );
+        grid.cursor.dir = Cursor::ccw( grid.cursor.dir );
 
     return ok;
 }
 
 code 
-L(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+L(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
     if (s.empty()) 
     {
@@ -164,7 +164,7 @@ L(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
         return err;
     } 
 
-    grid.cursor.dir = grid_base::Cursor::RIGHT; 
+    grid.cursor.dir = Cursor::RIGHT; 
     const auto stackval = s.peek();
 
     do {
@@ -182,7 +182,7 @@ L(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
 }  
 
 code 
-e(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+e(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
     return end;
 }

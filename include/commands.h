@@ -18,58 +18,58 @@ namespace cmds {
     };
 
     using stack_value_type = char;
-    using signature = code(grid_base&, stack<stack_value_type>&, std::istream&, std::ostream&, std::shared_ptr<spdlog::logger>&);   
+    using signature = code(GridBase&, Stack<stack_value_type>&, std::istream&, std::ostream&, std::shared_ptr<spdlog::logger>&);   
 
 
     namespace flow 
     {
-        code h(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code j(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code k(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code l(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code H(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code J(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code K(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code L(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code x(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code X(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code e(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code h(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code j(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code k(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code l(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code H(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code J(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code K(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code L(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code x(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code X(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code e(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
     }
 
     namespace stck
     {
-        code s(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code S(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code d(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code D(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code a(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code A(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code r(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code R(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code p(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code P(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code q(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code Q(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code m(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code M(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code f(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code F(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code s(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code S(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code d(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code D(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code a(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code A(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code r(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code R(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code p(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code P(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code q(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code Q(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code m(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code M(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code f(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code F(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
     } 
 
     namespace io 
     {
-        code o(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code O(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code i(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
-        code I(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code o(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code O(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code i(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
+        code I(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
     }
 
-    inline bool at_left(grid_base& grid)     { return grid.cursor.x <= 0; }
-    inline bool at_right(grid_base& grid)    { return grid.cursor.x >= grid.grid_.at(grid.cursor.x).size() -1; } 
-    inline bool at_top(grid_base& grid)      { return grid.cursor.y <= 0; }
-    inline bool at_bot(grid_base& grid)      { return grid.cursor.y >= grid.grid_.at(grid.cursor.y).size() -1; } 
-    inline bool above_avail(grid_base& grid) { return grid.cursor.y > 0; }
-    inline bool below_avail(grid_base& grid) { return grid.cursor.y < grid.grid_.size() -1; } 
+    inline bool at_left(GridBase& grid)     { return grid.cursor.x <= 0; }
+    inline bool at_right(GridBase& grid)    { return grid.cursor.x >= grid.matrix().at(grid.cursor.x).size() -1; } 
+    inline bool at_top(GridBase& grid)      { return grid.cursor.y <= 0; }
+    inline bool at_bot(GridBase& grid)      { return grid.cursor.y >= grid.matrix().at(grid.cursor.y).size() -1; } 
+    inline bool above_avail(GridBase& grid) { return grid.cursor.y > 0; }
+    inline bool below_avail(GridBase& grid) { return grid.cursor.y < grid.matrix().size() -1; } 
 }
 
 #endif

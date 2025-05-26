@@ -4,7 +4,7 @@
 #include <vector>
 
 template <typename T>
-class stack {
+class Stack {
 public: 
 
     using value_type = T;

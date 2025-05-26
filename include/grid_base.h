@@ -6,18 +6,18 @@
 #include <spdlog/logger.h>
 #include "cursor.h"
 
-class Grid_base
+class GridBase
 {
 public:
     Cursor cursor{};
 
-    Grid_base() = default;
+    GridBase() = default;
 
     char &catcur() { return grid_.at(cursor.y).at(cursor.x); }
 
     char &catpos(const unsigned y, const unsigned x) { return grid_.at(y).at(x); } 
 
-    virtual ~Grid_base() = default;
+    virtual ~GridBase() = default;
 
 protected:
     // matrix with height=42 and width=69, very sus 

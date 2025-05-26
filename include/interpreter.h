@@ -14,8 +14,8 @@ class Interpreter {
 public:
 
     Interpreter(
-        grid_base& grid,  
-        const perf_hashtable<std::function<cmds::signature>>& hasht,
+        GridBase& grid,  
+        const PerfHashtable<std::function<cmds::signature>>& hasht,
         std::istream& istream, 
         std::ostream& ostream, 
         std::shared_ptr<spdlog::logger>& logger
@@ -29,21 +29,24 @@ public:
     void resume() { coro_.resume(); } 
     void operator()() { coro_(); }
 
-    ~Interpreter() = default;
+    ~Interpreter() = default; 
 
 
-    /// @details these members are public for derivatives of operator_base
-    stack<char> stack_;
-    grid_base& grid_;
 
-private:
-    const perf_hashtable<std::function<cmds::signature>>& hasht_;
+private:  
+    Stack<char> stack_;
+    GridBase& grid_;
+    const PerfHashtable<std::function<cmds::signature>>& hasht_;
     std::ostream& ostream_;
     std::istream& istream_;
     std::shared_ptr<spdlog::logger> logger_; 
 
     Coroutine coro_;
-    Coroutine interpret(); 
+    Coroutine interpret();   
+
+public: // access points for ui::operators
+    auto stack() -> decltype(stack_)& { return stack_; } 
+    auto matrix() -> decltype(grid_.matrix())& { return grid_.matrix(); }
 };
 
 #endif

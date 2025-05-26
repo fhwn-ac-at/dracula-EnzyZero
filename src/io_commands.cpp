@@ -4,7 +4,7 @@ namespace cmds {
 namespace io {
 
 code 
-o(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+o(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
     if(!below_avail(grid))
     {
@@ -17,7 +17,7 @@ o(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
 } 
 
 code 
-O(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+O(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
     if(!above_avail(grid))
     {
@@ -30,7 +30,7 @@ O(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
 } 
 
 code 
-i(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+i(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
     if(!below_avail(grid))
     {
@@ -50,7 +50,7 @@ i(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& o
 } 
 
 code 
-I(grid_base& grid, stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+I(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 {
     if(!above_avail(grid))
     {

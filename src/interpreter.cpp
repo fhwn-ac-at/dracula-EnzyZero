@@ -5,7 +5,7 @@
 Coroutine Interpreter::interpret() 
 { 
     using Cmd  = std::function<cmds::signature>;  
-    using miss = perf_hashtable<Cmd>::table_miss;   
+    using miss = PerfHashtable<Cmd>::table_miss;   
  
     while(true)
     {
@@ -19,14 +19,14 @@ Coroutine Interpreter::interpret()
             co_return;
         }  
 
-        Cmd cmd = *exp; 
+        std::function<cmds::signature>& cmd = *exp; 
 
         // call command here, check return code
         if (cmds::code res = cmd(grid_, stack_, istream_, ostream_, logger_); res != cmds::ok)  
             co_return;
 
         // step to direction and check if possible
-        using enum grid_base::Cursor::direction;
+        using enum Cursor::Direction;
         switch (grid_.cursor.dir)
         {
             case NONE: 

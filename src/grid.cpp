@@ -3,7 +3,7 @@
 #include "grid.h"
 
 
-Grid::Grid(const char* path, std::shared_ptr<spdlog::logger> logger)
+Grid::Grid(const char path[], std::shared_ptr<spdlog::logger> logger)
 :   file_( path ),
     logger_( std::move(logger) )
 {

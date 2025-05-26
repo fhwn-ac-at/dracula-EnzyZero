@@ -3,7 +3,7 @@
 #include <memory>
 #include "grid_base.h"
 
-class Grid : public Grid_base {
+class Grid : public GridBase {
 public:
 
     /**

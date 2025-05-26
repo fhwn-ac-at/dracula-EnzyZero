@@ -5,7 +5,7 @@
 #include "perf_hashtable.h" 
 
 template <typename T>
-const unsigned perf_hashtable<T>::hash (const char c)
+const unsigned PerfHashtable<T>::hash (const char c)
 {
     static const unsigned char asso_values[] =
     {
@@ -28,7 +28,7 @@ const unsigned perf_hashtable<T>::hash (const char c)
 }
 
 template <typename T>
-const bool perf_hashtable<T>::in_word_set (const char c)
+const bool PerfHashtable<T>::in_word_set (const char c)
 {
     static const char wordlist[] =
     {
@@ -72,7 +72,7 @@ const bool perf_hashtable<T>::in_word_set (const char c)
 }
 
 template <typename T>
-auto perf_hashtable<T>::to_array(std::initializer_list<std::pair<char, T>> list) -> std::array<T, TOTAL_KEYWORDS> 
+auto PerfHashtable<T>::to_array(std::initializer_list<std::pair<char, T>> list) -> std::array<T, TOTAL_KEYWORDS> 
 {
     if (list.size() != TOTAL_KEYWORDS)
         throw std::range_error("initalizer list must be equal to MAX_HASH_VALUE");
