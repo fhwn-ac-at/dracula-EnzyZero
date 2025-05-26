@@ -82,7 +82,9 @@ int main(int nargs, char* args[]) {
         0,
         gridw.width
     ); 
-    posw.box();
+    posw.box();  
+    posw.create_subwindow();  
+    posw.subwindows()[0].set_scrollok(true);
     posw.refresh();
 
     ui::window stackw (
@@ -91,7 +93,8 @@ int main(int nargs, char* args[]) {
         posw.height,
         posw.startx
     ); 
-    stackw.box();
+    stackw.box(); 
+    stackw.create_subwindow();
     stackw.refresh();
 
     /*
@@ -104,7 +107,7 @@ int main(int nargs, char* args[]) {
      * 
      * The last ingredient is the hashtable, which will be initalised with the commands.
      */
-    auto log_sink = std::make_shared<ui::sink_st>( logw );
+    auto log_sink = std::make_shared<ui::sink_st>( logw.subwindows()[0] );
     logger->sinks().clear();
     logger->sinks().emplace_back(log_sink);
  
@@ -158,18 +161,22 @@ int main(int nargs, char* args[]) {
      * 2. Run it again and again with a delay
      * 3. If its done, its done  
      */ 
-
-    Interpreter interpreter(grid, hasht, std::cin, std::cout, logger); 
+    Interpreter interpreter(grid, hasht, nc, nc, logger); 
  
-    ui::GridOperator gridop(gridw, logger); 
-    ui::StackOperator stackop(stackw, logger);
+    ui::GridOperator gridop(gridw.subwindows()[0], logger); 
+    ui::StackOperator stackop(stackw.subwindows()[0], logger);  
+    ui::CursorOperator curop( posw.subwindows()[0], logger );
 
     do {
         interpreter.resume(); 
         gridop.render(interpreter);
-        stackop.render(interpreter); 
+        stackop.render(interpreter);  
+        curop.render(interpreter);
 
-        std::this_thread::sleep_for( std::chrono::milliseconds(500) );  
+        std::this_thread::sleep_for( std::chrono::milliseconds(100) );  
 
-    } while (!interpreter.done());
+    } while (!interpreter.done()); 
+
+    logger->info("Press any key to exit...");
+    nc.get();
 }

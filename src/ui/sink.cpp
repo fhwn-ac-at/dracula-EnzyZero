@@ -9,14 +9,14 @@ auto sink_st::level_what_(const spdlog::level::level_enum level) -> std::pair<st
 
     switch (level)
     {
-        case spdlog::level::trace:    return {"[TRACE]", CYAN_BLACK}; 
-        case debug:                   return {"[DEBUG]", MAGENTA_BLACK};
-        case info:                    return {"[INFO]",  GREEN_BLACK};
-        case warn:                    return {"[WARN]",  YELLOW_BLACK};
-        case err:                     return {"[ERROR]", RED_BLACK};
-        case critical:                return {"[CRIT]",  WHITE_RED};
-        case off:                     return {"[OFF]",   BLUE_BLACK};
-        default:                      return {"[IDK]",   WHITE_BLACK};
+        case spdlog::level::trace:    return {"[TRACE] ", CYAN_BLACK}; 
+        case debug:                   return {"[DEBUG] ", MAGENTA_BLACK};
+        case info:                    return {"[INFO] ",  GREEN_BLACK};
+        case warn:                    return {"[WARN] ",  YELLOW_BLACK};
+        case err:                     return {"[ERROR] ", RED_BLACK};
+        case critical:                return {"[CRIT] ",  WHITE_RED};
+        case off:                     return {"[OFF] ",   BLUE_BLACK};
+        default:                      return {"[IDK] ",   WHITE_BLACK};
     }
 
     std::unreachable();

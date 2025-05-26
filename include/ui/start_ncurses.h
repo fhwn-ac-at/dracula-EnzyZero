@@ -15,7 +15,8 @@ struct ncurses {
 
         initscr();
         curs_set(0); 
-        refresh(); // for some reason, not refreshing at start breaks stuff later :(
+        refresh(); // for some reason, not refreshing at start breaks stuff later :( 
+        raw();
         // cbreak();
         // noecho()
         // keypad(stdscr, TRUE)

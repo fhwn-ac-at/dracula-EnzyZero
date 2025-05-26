@@ -72,7 +72,7 @@ else() # not testing
     message(STATUS "Tests disabled") 
 
     add_executable(dracula ${SOURCES} ${UI_SRC}) 
-    target_include_directories(dracula PRIVATE ${INCLUDEDIR} ${UIINCLDIR}) 
+    target_include_directories(dracula PRIVATE ${INCLUDEDIR} ${UIINCLDIR})  
 
     target_link_libraries(dracula PRIVATE
         Curses::Curses

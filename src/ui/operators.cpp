@@ -25,21 +25,22 @@ void GridOperator::render(Interpreter& interpreter) {
         }
 
         // truncate if too long to be displayed
-        if (row.length() > window_.width)
-            row.resize(window_.width); 
+        if (row.length() > window_.width - 1)
+            row.resize(window_.width - 1);  
+
+        row += '\n'; // add a newline
 
         window_.print(row);
     } 
 
     // check if cursor can be displayed
-    if (grid.cursor.y >= window_.height || grid.cursor.x > window_.width)
+    if (grid.cursor.y > window_.height - 1 || grid.cursor.x > window_.width - 1)
     {
         window_.refresh();
         return;
     }
 
     // set terminal cursor to grids cursor
-    auto [save_y, save_x] = window_.get_cursor(); 
     window_.set_cursor(grid.cursor.y, grid.cursor.x);
         
     // highlight
@@ -47,22 +48,25 @@ void GridOperator::render(Interpreter& interpreter) {
     window_.print("{}", grid.matrix().at(grid.cursor.y).at(grid.cursor.x));  
     window_.rem_textcolor(colors::BLUE_WHITE);
 
-    // reset cursor and display changes
-    window_.set_cursor(save_y, save_x);
+    // display changes
     window_.refresh();
 }
 
-void StackOperator::render(Interpreter& interpreter) { 
+void StackOperator::render(Interpreter& interpreter) {   
 
-    window_.set_cursor(0, 0);
+    auto& stack = interpreter.stack();
+    if (stack.empty()) 
+        return;
+ 
+    window_.set_cursor(0, 0); // reset cur
     
-    auto it = interpreter.stack().begin();   
-    auto end = interpreter.stack().end(); 
+    auto it = stack.begin();   
+    auto end = stack.end(); 
 
-    for (int i = 0; i < window_.height && it != end; i++) 
-    {  
+    for (int i = 0; i < window_.height && it != end; i++, it++) 
+    {
         // convert stack value to string, fit to window width
-        std::string value = std::format("{}{}", i, *it++); 
+        std::string value = std::format("{}.: {}\n", i, static_cast<int>(*it)); 
         if (value.length() > window_.width)
             value.resize(window_.width); 
          
@@ -73,10 +77,17 @@ void StackOperator::render(Interpreter& interpreter) {
 } 
 
 void CursorOperator::render(Interpreter& interpreter) {
+  
+    auto& cursor = interpreter.grid().cursor; 
  
-    
-    
+    // note that std::formatter was specialised in order for this to work
+    std::string msg = std::format("{}\n", cursor);
+     
+    if (msg.length() > window_.width) // trunc to window width
+        msg.resize(window_.width); 
 
+    window_.print(msg);
+    window_.refresh();
 }
 
 

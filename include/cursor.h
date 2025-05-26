@@ -1,6 +1,7 @@
 #ifndef cursor_h
 #define cursor_h  
 
+#include <format>
 #include <stdint.h>
 
 struct Cursor {  
@@ -19,8 +20,36 @@ struct Cursor {
     Direction dir{NONE};
      
     static constexpr Direction cw(Direction dir)  { return static_cast<Direction>(1 + (dir % 4)); } 
-    static constexpr Direction ccw(Direction dir) { return static_cast<Direction>(1 + (5 + (dir - 2)) % 4); }
-};
+    static constexpr Direction ccw(Direction dir) { return static_cast<Direction>(1 + (dir + 2) % 4); } 
 
+    static constexpr const char* dir_tostr(Direction dir) {
+
+        switch (dir)
+        {
+            case NONE:  return "none "; 
+            case UP:    return "up   ";
+            case RIGHT: return "right";
+            case DOWN:  return "down ";
+            case LEFT:  return "left "; 
+            default:    return " ??? ";
+        }  
+
+        std::unreachable();
+    } 
+}; 
+
+
+// custom printing format for cursor  
+template <>
+struct std::formatter<Cursor>
+{
+    constexpr auto parse(std::format_parse_context& ctx) {
+        return ctx.begin();
+    }  
+ 
+    auto format(const Cursor& cur, std::format_context& ctx) const {
+        return std::format_to(ctx.out(), "dir: {} y: {} x: {}", Cursor::dir_tostr(cur.dir), cur.y, cur.x);
+    }
+};
 
 #endif

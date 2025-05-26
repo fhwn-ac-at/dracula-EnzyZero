@@ -126,8 +126,6 @@ x(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
         log->error("NO::DIRECTION::ERROR cannot turn without an initial direction"); 
         return err;
     } 
-    else if (s.peek() == 0) 
-        log->warn("ZERO::WARN top val of stack is 0");
   
     // turn clockwise if top is positive
     if(s.peek() > 0)
@@ -149,9 +147,6 @@ X(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
         log->error("NO::DIRECTION::ERROR cannot turn without an initial direction"); 
         return err; 
     }   
-    else if (s.peek() == 0) 
-        log->warn("ZERO::WARN top val of stack is 0");
-
   
     // turn anticlockwise if top is negative
     if(s.peek() < 0)
