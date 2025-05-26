@@ -26,12 +26,12 @@ struct Cursor {
 
         switch (dir)
         {
-            case NONE:  return "none "; 
-            case UP:    return "up   ";
+            case NONE:  return "none"; 
+            case UP:    return "up";
             case RIGHT: return "right";
-            case DOWN:  return "down ";
-            case LEFT:  return "left "; 
-            default:    return " ??? ";
+            case DOWN:  return "down";
+            case LEFT:  return "left"; 
+            default:    return "???";
         }  
 
         std::unreachable();
@@ -47,8 +47,10 @@ struct std::formatter<Cursor>
         return ctx.begin();
     }  
  
-    auto format(const Cursor& cur, std::format_context& ctx) const {
-        return std::format_to(ctx.out(), "dir: {} y: {} x: {}", Cursor::dir_tostr(cur.dir), cur.y, cur.x);
+    auto format(const Cursor& cur, std::format_context& ctx) const { 
+
+        // print with paddings
+        return std::format_to(ctx.out(), "dir: {:<5} y: {:<2} x: {:<2}", Cursor::dir_tostr(cur.dir), cur.y, cur.x);
     }
 };
 
