@@ -8,10 +8,10 @@
 
 namespace ui {
 
-class operator_base {
+class OperatorBase {
 public:
 
-    operator_base(
+    OperatorBase(
         window_base& window,
         std::shared_ptr<spdlog::logger>& logger
     )
@@ -21,16 +21,12 @@ public:
 
     virtual void render(Interpreter& interpreter) = 0;
 
-    virtual ~operator_base() = default;
+    virtual ~OperatorBase() = default;
 
 protected:
     window_base& window_;
     std::shared_ptr<spdlog::logger> logger_;
 };
-
-// concept for checking derivatives
-template <typename T>
-concept DerivedOperator = std::is_base_of_v<operator_base, T>;
 
 } // ui namespace
 

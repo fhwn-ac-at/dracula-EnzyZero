@@ -5,14 +5,34 @@
 
 namespace ui {
 
-class grid_operator final : public operator_base {
+class GridOperator : public OperatorBase {
 public:
 
-    using operator_base::operator_base;
+    using OperatorBase::OperatorBase;
 
     void render(Interpreter& interpreter) override;
 
-    ~grid_operator() override = default;
+    ~GridOperator() override = default;
+}; 
+
+class StackOperator : public OperatorBase {
+public:  
+
+    using OperatorBase::OperatorBase;
+
+    void render(Interpreter& interpreter) override;
+
+    ~StackOperator() override = default;
+};  
+
+class CursorOperator : public OperatorBase {
+public:  
+  
+    using OperatorBase::OperatorBase;
+
+    void render(Interpreter& interpreter) override;
+
+    ~CursorOperator() override = default;
 };
 
 } // ui namespace

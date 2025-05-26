@@ -5,7 +5,7 @@
 
 unsigned call_count = 0;
 
-cmds::code func(grid_base& grid, stack<cmds::stack_value_type>& stack, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& logger) {
+cmds::code func(GridBase& grid, Stack<cmds::stack_value_type>& stack, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& logger) {
     call_count++;
     return cmds::ok;
 }
@@ -13,13 +13,17 @@ cmds::code func(grid_base& grid, stack<cmds::stack_value_type>& stack, std::istr
 TEST(HashTable, Basic) {
 
     std::function<cmds::signature> cb = func;
-    grid_base grd;
-    stack<cmds::stack_value_type> s;
+    GridBase grd;
+    Stack<cmds::stack_value_type> s;
     auto logger = spdlog::null_logger_st("nolog");
 
-    auto test = [&](){
+    auto test = [&](){ 
 
-        const perf_hashtable hasht{
+        using PerfHashtable = PerfHashtable<std::function<cmds::signature>>;
+
+        const PerfHashtable 
+        hasht
+        { 
             {'x', cb },
             {'e', cb },
             {'I', cb },
@@ -55,15 +59,15 @@ TEST(HashTable, Basic) {
 
         using namespace cmds;
 
-        EXPECT_EQ(hasht('a', grd, s, std::cin, std::cout, logger), ok);
-        EXPECT_EQ(hasht('l', grd, s, std::cin, std::cout, logger), ok);
-        EXPECT_EQ(hasht('q', grd, s, std::cin, std::cout, logger), ok);
-        EXPECT_EQ(hasht('S', grd, s, std::cin, std::cout, logger), ok);
-        EXPECT_EQ(hasht('J', grd, s, std::cin, std::cout, logger), ok);
-        EXPECT_EQ(hasht('m', grd, s, std::cin, std::cout, logger), ok);
-        EXPECT_EQ(hasht('k', grd, s, std::cin, std::cout, logger), ok);
+        EXPECT_EQ(hasht.at('a').value()(grd, s, std::cin, std::cout, logger), ok);
+        EXPECT_EQ(hasht.at('l').value()(grd, s, std::cin, std::cout, logger), ok);
+        EXPECT_EQ(hasht.at('q').value()(grd, s, std::cin, std::cout, logger), ok);
+        EXPECT_EQ(hasht.at('S').value()(grd, s, std::cin, std::cout, logger), ok);
+        EXPECT_EQ(hasht.at('J').value()(grd, s, std::cin, std::cout, logger), ok);
+        EXPECT_EQ(hasht.at('m').value()(grd, s, std::cin, std::cout, logger), ok);
+        EXPECT_EQ(hasht.at('k').value()(grd, s, std::cin, std::cout, logger), ok);
 
-        EXPECT_EQ(hasht('c', grd, s, std::cin, std::cout, logger), miss);
+        EXPECT_EQ(hasht.at('c').error(), PerfHashtable::table_miss{});
 
         EXPECT_EQ(call_count, 7);
     };

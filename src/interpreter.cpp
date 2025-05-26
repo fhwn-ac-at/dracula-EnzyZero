@@ -17,9 +17,9 @@ Coroutine Interpreter::interpret()
         {
             logger_->error("HASH::TABLE::MISS encountered character (hex): 0x{:02X}", c); 
             co_return;
-        }  
+        } 
 
-        std::function<cmds::signature>& cmd = *exp; 
+        std::function<cmds::signature> cmd = *exp; 
 
         // call command here, check return code
         if (cmds::code res = cmd(grid_, stack_, istream_, ostream_, logger_); res != cmds::ok)  

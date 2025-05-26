@@ -32,7 +32,6 @@ public:
     ~Interpreter() = default; 
 
 
-
 private:  
     Stack<char> stack_;
     GridBase& grid_;
@@ -42,11 +41,11 @@ private:
     std::shared_ptr<spdlog::logger> logger_; 
 
     Coroutine coro_;
-    Coroutine interpret();   
+    Coroutine interpret();
 
 public: // access points for ui::operators
     auto stack() -> decltype(stack_)& { return stack_; } 
-    auto matrix() -> decltype(grid_.matrix())& { return grid_.matrix(); }
+    auto grid() -> decltype(grid_)& { return grid_; }
 };
 
 #endif

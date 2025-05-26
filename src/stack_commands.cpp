@@ -18,7 +18,7 @@ s(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 } 
 
 code 
-s(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+S(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
 { 
     if(!above_avail(grid)) 
     {

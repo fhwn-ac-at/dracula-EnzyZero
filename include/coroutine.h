@@ -37,8 +37,8 @@ struct Coroutine {
     Coroutine& operator=(Coroutine&& other) noexcept;
 
 
-    operator bool() { return coro_ && coro_.done(); }
-    bool done() { return !operator bool(); }
+    operator bool() { return !!coro_; }
+    bool done() { return coro_.done(); }
 
     void resume() { coro_.resume(); }
     void operator()() { resume(); }

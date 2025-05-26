@@ -3,7 +3,7 @@
 
 TEST(StackTest, Basic) {
 
-    stack<unsigned> s; 
+    Stack<short> s; 
     s.push(42);
     EXPECT_EQ(s.peek(), 42);
 

@@ -12,7 +12,8 @@
 #include "windows.h" 
 #include "perf_hashtable.h"
 #include "grid.h"
-#include "streambuf.h"
+#include "streambuf.h" 
+#include "operators.h"
 
 int main(int nargs, char* args[]) { 
 
@@ -159,12 +160,16 @@ int main(int nargs, char* args[]) {
      */ 
 
     Interpreter interpreter(grid, hasht, std::cin, std::cout, logger); 
+ 
+    ui::GridOperator gridop(gridw, logger); 
+    ui::StackOperator stackop(stackw, logger);
 
-    // TODO operators missing
-  
-    while (!interpreter.done())   
-    {
-        interpreter.resume();
-        std::this_thread::sleep_for( std::chrono::milliseconds(500) ); 
-    }
+    do {
+        interpreter.resume(); 
+        gridop.render(interpreter);
+        stackop.render(interpreter); 
+
+        std::this_thread::sleep_for( std::chrono::milliseconds(500) );  
+
+    } while (!interpreter.done());
 }

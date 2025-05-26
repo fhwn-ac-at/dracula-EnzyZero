@@ -15,16 +15,18 @@ constexpr std::array<std::string_view, 3> grid_input
 using namespace cmds::flow;
 
 class Flow : public testing::Test {
-public: 
+public:  
+
+    using PerfHashtable = PerfHashtable<std::function<cmds::signature>>;
 
     void SetUp() override { 
 
-        assert(grid_input.size() == grid.grid_.size() && "Grid row count mismatch"); 
+        assert(grid_input.size() == grid.matrix().size() && "Grid row count mismatch"); 
 
         // copy grid_input chars to grid.grid_
         for (size_t row = 0; row < grid_input.size(); row++) 
         { 
-            auto& gline     = grid.grid_.at(row);
+            auto& gline     = grid.matrix().at(row);
             auto& inputline = grid_input.at(row); 
 
             size_t len = std::min(gline.size(), inputline.size()); 
@@ -33,11 +35,12 @@ public:
                 gline.at(col) = inputline.at(col);
         }
     }
-
-    grid_base grid;
-    std::shared_ptr<spdlog::logger> nosink = spdlog::null_logger_st("nolog");
-    perf_hashtable hasht{
-
+ 
+    Stack<char> stack;
+    GridBase grid;
+    std::shared_ptr<spdlog::logger> logger = spdlog::null_logger_st("nolog");
+    PerfHashtable hasht
+    {
         {'e', e },
         {'l', l },
         {'L', L },
@@ -72,16 +75,88 @@ public:
         {'Q', no }
     };  
 
-    static cmds::code no(grid_base& grid, stack<cmds::stack_value_type>& stack, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& logger) { 
+    static cmds::code no(GridBase& grid, Stack<cmds::stack_value_type>& stack, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& logger) { 
         return cmds::err;
     }
-
 };
 
 
-
-
 TEST_F(Flow, h) { 
+    ASSERT_TRUE(hasht.at('h').has_value());
 
+    auto cmd = *hasht.at('h');  
+    EXPECT_EQ(cmd(grid, stack, std::cin, std::cout, logger), cmds::ok); 
+    EXPECT_EQ(grid.cursor.dir, Cursor::LEFT);
+} 
 
+TEST_F(Flow, j) { 
+    ASSERT_TRUE(hasht.at('j').has_value());
+
+    auto cmd = *hasht.at('j');  
+    EXPECT_EQ(cmd(grid, stack, std::cin, std::cout, logger), cmds::ok); 
+    EXPECT_EQ(grid.cursor.dir, Cursor::DOWN);
+} 
+
+TEST_F(Flow, k) { 
+    ASSERT_TRUE(hasht.at('k').has_value());
+
+    auto cmd = *hasht.at('k');  
+    EXPECT_EQ(cmd(grid, stack, std::cin, std::cout, logger), cmds::ok); 
+    EXPECT_EQ(grid.cursor.dir, Cursor::UP);
+} 
+
+TEST_F(Flow, l) { 
+    ASSERT_TRUE(hasht.at('l').has_value());
+
+    auto cmd = *hasht.at('l');  
+    EXPECT_EQ(cmd(grid, stack, std::cin, std::cout, logger), cmds::ok); 
+    EXPECT_EQ(grid.cursor.dir, Cursor::RIGHT);
+} 
+
+TEST_F(Flow, H) {  
+    constexpr char C = 'H'; 
+
+    ASSERT_TRUE(hasht.at(C).has_value());
+ 
+    // this should fail "stack empty"
+    auto cmd = *hasht.at(C);  
+    EXPECT_EQ(cmd(grid, stack, std::cin, std::cout, logger), cmds::err);  
+ 
+    // not found 
+    stack.push(' '); 
+    auto cmd = *hasht.at(C);  
+    EXPECT_EQ(cmd(grid, stack, std::cin, std::cout, logger), cmds::err);  
+     
+    // ok and found 
+    grid.cursor.x = 5;  
+    stack.push('1');
+    auto cmd = *hasht.at(C);  
+    EXPECT_EQ(cmd(grid, stack, std::cin, std::cout, logger), cmds::ok);  
+    EXPECT_EQ(Cursor::LEFT, grid.cursor.dir);  
+    EXPECT_EQ(0, grid.cursor.x);
+    EXPECT_EQ(0, grid.cursor.y); 
+}  
+
+TEST_F(Flow, J) { 
+    constexpr char C = 'J';  
+
+    ASSERT_TRUE(hasht.at(C).has_value());
+ 
+    // this should fail "stack empty"
+    auto cmd = *hasht.at(C);  
+    EXPECT_EQ(cmd(grid, stack, std::cin, std::cout, logger), cmds::err);  
+ 
+    // not found 
+    stack.push(' '); 
+    auto cmd = *hasht.at(C);  
+    EXPECT_EQ(cmd(grid, stack, std::cin, std::cout, logger), cmds::err);  
+     
+    // ok and found 
+    grid.cursor.x = 5;  
+    stack.push('1');
+    auto cmd = *hasht.at(C);  
+    EXPECT_EQ(cmd(grid, stack, std::cin, std::cout, logger), cmds::ok);  
+    EXPECT_EQ(Cursor::LEFT, grid.cursor.dir);  
+    EXPECT_EQ(0, grid.cursor.x);
+    EXPECT_EQ(0, grid.cursor.y); 
 }
