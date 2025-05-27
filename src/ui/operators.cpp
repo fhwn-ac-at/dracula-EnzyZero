@@ -8,30 +8,36 @@ namespace ui {
 void GridOperator::render(Interpreter& interpreter) {
 
     GridBase& grid = interpreter.grid(); 
-    window_.set_cursor(0, 0);
+    window_.set_cursor(0, 0); 
 
-    for (const auto& line : grid.matrix()) 
-    {
-        std::string row; 
+    { 
+        // reserve string storage
+        std::string row;  
+        row.reserve(window_.width);
 
-        // add fields in the grid, check if they are printable
-        for (const auto& field : line) 
-        { 
-            row += std::isprint(static_cast<unsigned char>(field)) 
-                ?  field            // field is printable
-                :  field == 0       // field is empty
-                ?  ' '              // then print whitespace
-                :  '#';             // else, print a hash
-        }
+        for (const auto& line : grid.matrix()) 
+        {
 
-        // truncate if too long to be displayed
-        if (row.length() > window_.width - 1)
-            row.resize(window_.width - 1);  
+            // add fields in the grid, check if they are printable
+            for (const auto& field : line) 
+            { 
+                row += std::isprint(static_cast<unsigned char>(field)) 
+                    ?  field            // field is printable
+                    :  field == 0       // field is empty
+                    ?  ' '              // then print whitespace
+                    :  '#';             // else, print a hash
+            }
 
-        row += '\n'; // add a newline
+            // truncate if too long to be displayed
+            if (row.length() > window_.width - 1)
+                row.resize(window_.width - 1);  
 
-        window_.print(row);
-    } 
+            row += '\n'; // add a newline
+
+            window_.print(row); 
+            row.clear(); // capacity not freed here
+        }  
+    }
 
     // check if cursor can be displayed
     if (grid.cursor.y > window_.height - 1 || grid.cursor.x > window_.width - 1)
@@ -66,9 +72,12 @@ void StackOperator::render(Interpreter& interpreter) {
     for (int i = 0; i < window_.height && it != end; i++, it++) 
     {
         // convert stack value to string, fit to window width
-        std::string value = std::format("{}.: {}\n", i, static_cast<int>(*it)); 
+        std::string value = std::format("{:<2}.: {}\n", i, static_cast<int>(*it)); 
         if (value.length() > window_.width)
-            value.resize(window_.width); 
+        {
+            value.resize(window_.width - 1);   
+            value += '\n';
+        }
          
         window_.print(value);
     } 
@@ -80,11 +89,14 @@ void CursorOperator::render(Interpreter& interpreter) {
   
     auto& cursor = interpreter.grid().cursor; 
  
-    // note that std::formatter was specialised in order for this to work
+    // note that std::formatter was specialised to work with Cursor
     std::string msg = std::format("{}\n", cursor);
      
-    if (msg.length() > window_.width) // trunc to window width
-        msg.resize(window_.width); 
+    if (msg.length() > window_.width) // trunc to window width 
+    {
+        msg.resize(window_.width - 1);  
+        msg += '\n';
+    }
 
     window_.print(msg);
     window_.refresh();
