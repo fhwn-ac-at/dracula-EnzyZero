@@ -33,7 +33,7 @@ public:
 
 
 private:  
-    Stack<char> stack_;
+    Stack<signed char> stack_;
     GridBase& grid_;
     const PerfHashtable<std::function<cmds::signature>>& hasht_;
     std::ostream& ostream_;

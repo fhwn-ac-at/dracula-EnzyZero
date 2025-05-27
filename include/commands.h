@@ -17,7 +17,7 @@ namespace cmds {
         end
     };
 
-    using stack_value_type = char;
+    using stack_value_type = signed char;
     using signature = code(GridBase&, Stack<stack_value_type>&, std::istream&, std::ostream&, std::shared_ptr<spdlog::logger>&);   
 
 

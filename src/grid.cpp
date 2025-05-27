@@ -13,11 +13,11 @@ Grid::Grid(const char path[], std::shared_ptr<spdlog::logger> logger)
     // read from the ifstream
     for (auto& line : this->grid_)
     {
-        char c{};
+        signed char c{};
 
         for(auto& field : line)
         {
-            file_.get(c);
+            file_ >> c;
 
             if (c == '\n' || !file_.good() ) // good includes reaching eof
                 break;
@@ -63,5 +63,5 @@ Grid::Grid(const char path[], std::shared_ptr<spdlog::logger> logger)
     return;
 
 critical:
-    logger_->critical("GRID::FILE::OPENING::ERROR: The given file might not exist"); 
+    logger_->critical("GRID::FILE::ERROR: The given file might not exist"); 
 }
