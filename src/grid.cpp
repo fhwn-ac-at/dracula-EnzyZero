@@ -13,17 +13,17 @@ Grid::Grid(const char path[], std::shared_ptr<spdlog::logger> logger)
     // read from the ifstream
     for (auto& line : this->grid_)
     {
-        signed char c{};
+        char c{};
 
         for(auto& field : line)
         {
-            file_ >> c;
+            file_.get(c);
 
             if (c == '\n' || !file_.good() ) // good includes reaching eof
                 break;
 
             // add character to row
-            field = c;
+            field = static_cast<signed char>(c);
         }
 
         if ( file_.eof() )

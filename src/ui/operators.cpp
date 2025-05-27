@@ -47,11 +47,11 @@ void GridOperator::render(Interpreter& interpreter) {
     }
 
     // set terminal cursor to grids cursor
-    window_.set_cursor(grid.cursor.y, grid.cursor.x);
-        
+    window_.set_cursor(grid.cursor.y, grid.cursor.x); 
+
     // highlight
     window_.set_textcolor(colors::BLUE_WHITE);
-    window_.print("{}", grid.matrix().at(grid.cursor.y).at(grid.cursor.x));  
+    window_.print("{}", static_cast<char>( (grid.matrix().at(grid.cursor.y).at(grid.cursor.x)) ));  
     window_.rem_textcolor(colors::BLUE_WHITE);
 
     // display changes
@@ -72,7 +72,7 @@ void StackOperator::render(Interpreter& interpreter) {
     for (int i = 0; i < window_.height && it != end; i++, it++) 
     {
         // convert stack value to string, fit to window width
-        std::string value = std::format("{:<2}.: {}\n", i, static_cast<int>(*it)); 
+        std::string value = std::format("{:>2}.: {}\n", i, static_cast<int>(*it)); 
         if (value.length() > window_.width)
         {
             value.resize(window_.width - 1);   

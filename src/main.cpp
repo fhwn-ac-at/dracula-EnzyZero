@@ -62,8 +62,8 @@ int main(int nargs, char* args[]) {
         gridw.height
     );
     logw.box();
-    logw.set_scrollok(true);
     logw.create_subwindow();
+    logw.subwindows()[0].set_scrollok(true);
     logw.refresh();
 
     ui::window iow (
@@ -73,7 +73,7 @@ int main(int nargs, char* args[]) {
     );
     iow.box();
     iow.create_subwindow();
-    iow.set_scrollok(true);
+    iow.subwindows()[0].set_scrollok(true);
     iow.refresh();
 
     ui::window posw (
