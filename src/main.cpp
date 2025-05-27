@@ -155,27 +155,76 @@ int main(int nargs, char* args[]) {
         {'q', q },
         {'Q', Q }
     }; 
-
-    /**
-     * 1. Make the interpreter and pass resources
-     * 2. Run it again and again with a delay
+ 
+     /**
+     * 1. Make the interpreter and pass resources 
+     * 2. Make the ui::operators to print the internals to the screen
+     * 2. Run in a loop, process key-presses and step or delay
      * 3. If its done, its done  
      */ 
     Interpreter interpreter(grid, hasht, nc, nc, logger); 
  
     ui::GridOperator gridop(gridw.subwindows()[0], logger); 
     ui::StackOperator stackop(stackw.subwindows()[0], logger);  
-    ui::CursorOperator curop( posw.subwindows()[0], logger );
+    ui::CursorOperator curop( posw.subwindows()[0], logger );   
+ 
+    // infos for user
+    gridop.render(interpreter);
+    logger->info("While running, press 'q' to exit, 'n' to step/start stepping and 'c' to continue"); 
+    logger->info("Press any key to start...");
+    nc.get();
 
-    do {
+    bool stepping = false;   
+    streamb.set_blocking(false); 
+
+
+    do {    
+ 
+        // block for io if stepping
+        if (!stepping)
+            streamb.set_blocking(false);
+  
+        // process key inputs
+        if (char c = nc.get(); c != std::char_traits<char>::eof() )   
+        {
+            switch (c)
+            {
+                case 'q': 
+                    return EXIT_SUCCESS; // exit program
+
+                case 'c':   
+                    if (stepping) 
+                    {
+                        logger->info("MODE::CONTINUE continuing"); 
+                        stepping = false; 
+                    }
+                    break;
+
+                case 'n': 
+                    if (!stepping) 
+                    {
+                        logger->info("MODE::STEPPING stepping");
+                        stepping = true; 
+                    } 
+                    break;  
+
+                default: 
+                    logger->warn("INVALID::INPUT must be 'q' (quit), 'n' (step) or 'c' (continue)"); 
+                    break;
+            }  
+        }
+
+        streamb.set_blocking(true); // some io commands need to block
+ 
         interpreter.resume(); 
         gridop.render(interpreter);
         stackop.render(interpreter);  
-        curop.render(interpreter);
+        curop.render(interpreter);  
+  
+        if (!stepping)
+            std::this_thread::sleep_for( std::chrono::milliseconds(100) );  
 
-        std::this_thread::sleep_for( std::chrono::milliseconds(100) );  
-
-    } while (!interpreter.done()); 
+    } while (!interpreter.done());  
 
     logger->info("Press any key to exit...");
     nc.get();

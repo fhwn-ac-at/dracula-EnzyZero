@@ -13,7 +13,9 @@ public:
     :   window_(window)
     {}
 
-    ~streambuf() override = default;
+    ~streambuf() override = default; 
+
+    void set_blocking(bool b) { window_.set_nodelay(!b); }
 
 protected:
 
@@ -21,9 +23,9 @@ protected:
 
     int_type overflow(int_type ch = traits_type::eof()) override;
 
-    int_type underflow() override { return traits_type::to_int_type(window_.getc()); }
+    int_type underflow() override {  return traits_type::to_int_type(window_.getc()); }
 
-    int_type uflow() override { return underflow(); }
+    int_type uflow() override { return underflow(); } 
 
 private:
     window_base& window_;
