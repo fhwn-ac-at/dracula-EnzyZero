@@ -36,8 +36,8 @@ private:
     Stack<signed char> stack_;
     GridBase& grid_;
     const PerfHashtable<std::function<cmds::signature>>& hasht_;
-    std::ostream& ostream_;
     std::istream& istream_;
+    std::ostream& ostream_;
     std::shared_ptr<spdlog::logger> logger_; 
 
     Coroutine coro_;

@@ -5,7 +5,7 @@
 #include "perf_hashtable.h" 
 
 template <typename T>
-const unsigned PerfHashtable<T>::hash (const char c)
+unsigned PerfHashtable<T>::hash (const char c)
 {
     static const unsigned char asso_values[] =
     {
@@ -28,7 +28,7 @@ const unsigned PerfHashtable<T>::hash (const char c)
 }
 
 template <typename T>
-const bool PerfHashtable<T>::in_word_set (const char c)
+bool PerfHashtable<T>::in_word_set (const char c)
 {
     static const char wordlist[] =
     {
@@ -64,8 +64,8 @@ const bool PerfHashtable<T>::in_word_set (const char c)
         'm',
         'Q'
     };
-
-    if (hash(c) <= MAX_HASH_VALUE)
+ 
+    if (unsigned key = hash(c); key <= MAX_HASH_VALUE && c == wordlist[key])
         return true;
 
     return false;

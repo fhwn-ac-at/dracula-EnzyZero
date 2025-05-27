@@ -39,8 +39,8 @@ private:
 
     const std::array<T, TOTAL_KEYWORDS> values_; 
 
-    static const bool in_word_set(const char c); 
-    static const unsigned hash(const char c);
+    static bool in_word_set(const char c); 
+    static unsigned hash(const char c);
     static auto to_array(std::initializer_list<std::pair<char, T>> list) -> std::array<T, TOTAL_KEYWORDS>; 
 };  
 

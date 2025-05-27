@@ -5,7 +5,7 @@ namespace cmds {
 namespace stck {
 
 code 
-s(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+s(GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 { 
     if(!below_avail(grid)) 
     {
@@ -18,7 +18,7 @@ s(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 } 
 
 code 
-S(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+S(GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 { 
     if(!above_avail(grid)) 
     {
@@ -31,7 +31,7 @@ S(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 } 
 
 code 
-d(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+d([[maybe_unused]] GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 {
     if(s.empty())
     {
@@ -44,7 +44,7 @@ d(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 }
 
 code 
-D(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+D([[maybe_unused]] GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 {
     if(s.empty())
     {
@@ -57,7 +57,7 @@ D(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 }
 
 code 
-a(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+a(GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 { 
     if(!below_avail(grid)) 
     {
@@ -75,7 +75,7 @@ a(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 } 
 
 code 
-A(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+A(GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 { 
     if(!above_avail(grid)) 
     {
@@ -93,7 +93,7 @@ A(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 }
 
 code 
-r(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+r(GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 { 
     if(!below_avail(grid)) 
     {
@@ -111,7 +111,7 @@ r(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 } 
 
 code 
-R(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+R(GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 { 
     if(!above_avail(grid)) 
     {
@@ -129,7 +129,7 @@ R(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 } 
 
 code 
-p(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+p(GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 { 
     if(!below_avail(grid)) 
     {
@@ -147,7 +147,7 @@ p(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 }
 
 code 
-P(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+P(GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 { 
     if(!above_avail(grid)) 
     {
@@ -165,7 +165,7 @@ P(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 }
 
 code 
-q(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+q(GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 { 
     if(!below_avail(grid)) 
     {
@@ -183,7 +183,7 @@ q(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 }
 
 code 
-Q(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+Q(GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 { 
     if(!above_avail(grid)) 
     {
@@ -201,7 +201,7 @@ Q(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 }
 
 code 
-m(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+m(GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 { 
     if(!below_avail(grid)) 
     {
@@ -219,7 +219,7 @@ m(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 }
 
 code 
-M(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log) 
+M(GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 { 
     if(!above_avail(grid)) 
     {
@@ -237,7 +237,7 @@ M(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 }
 
 code 
-f(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log)  
+f(GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 { 
     if (!below_avail(grid))
     {
@@ -255,7 +255,7 @@ f(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os
 } 
 
 code 
-F(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log)  
+F(GridBase& grid, Stack<stack_value_type>& s, [[maybe_unused]] std::istream& is, [[maybe_unused]] std::ostream& os, [[maybe_unused]] std::shared_ptr<spdlog::logger>& log)
 { 
     if (!above_avail(grid))
     {

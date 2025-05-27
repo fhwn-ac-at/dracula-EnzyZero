@@ -64,12 +64,12 @@ namespace cmds {
         code I(GridBase& grid, Stack<stack_value_type>& s, std::istream& is, std::ostream& os, std::shared_ptr<spdlog::logger>& log);
     }
 
-    inline bool at_left(GridBase& grid)     { return grid.cursor.x <= 0; }
-    inline bool at_right(GridBase& grid)    { return grid.cursor.x >= grid.matrix().at(grid.cursor.x).size() -1; } 
-    inline bool at_top(GridBase& grid)      { return grid.cursor.y <= 0; }
-    inline bool at_bot(GridBase& grid)      { return grid.cursor.y >= grid.matrix().at(grid.cursor.y).size() -1; } 
-    inline bool above_avail(GridBase& grid) { return grid.cursor.y > 0; }
-    inline bool below_avail(GridBase& grid) { return grid.cursor.y < grid.matrix().size() -1; } 
+    inline bool at_left(GridBase& grid)     { return static_cast<size_t>(grid.cursor.x) <= 0; }
+    inline bool at_right(GridBase& grid)    { return static_cast<size_t>(grid.cursor.x) >= grid.matrix().at(grid.cursor.x).size() -1; } 
+    inline bool at_top(GridBase& grid)      { return static_cast<size_t>(grid.cursor.y) <= 0; }
+    inline bool at_bot(GridBase& grid)      { return static_cast<size_t>(grid.cursor.y) >= grid.matrix().at(grid.cursor.y).size() -1; } 
+    inline bool above_avail(GridBase& grid) { return static_cast<size_t>(grid.cursor.y) > 0; }
+    inline bool below_avail(GridBase& grid) { return static_cast<size_t>(grid.cursor.y) < grid.matrix().size() -1; } 
 }
 
 #endif

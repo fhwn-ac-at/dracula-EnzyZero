@@ -29,7 +29,7 @@ void GridOperator::render(Interpreter& interpreter) {
             }
 
             // truncate if too long to be displayed
-            if (row.length() > window_.width - 1)
+            if (row.length() > static_cast<size_t>(window_.width - 1))
                 row.resize(window_.width - 1);  
 
             row += '\n'; // add a newline
@@ -66,14 +66,15 @@ void StackOperator::render(Interpreter& interpreter) {
  
     window_.set_cursor(0, 0); // reset cur
     
-    auto it = stack.begin();   
+    auto it = stack.begin();
     auto end = stack.end(); 
 
     for (int i = 0; i < window_.height && it != end; i++, it++) 
     {
         // convert stack value to string, fit to window width
-        std::string value = std::format("{:>2}.: {}\n", i, static_cast<int>(*it)); 
-        if (value.length() > window_.width)
+        std::string value = std::format("{:>2}.: {}\n", i, static_cast<int>(*it));  
+
+        if (value.length() > static_cast<size_t>(window_.width))
         {
             value.resize(window_.width - 1);   
             value += '\n';
@@ -92,7 +93,7 @@ void CursorOperator::render(Interpreter& interpreter) {
     // note that std::formatter was specialised to work with Cursor
     std::string msg = std::format("{}\n", cursor);
      
-    if (msg.length() > window_.width) // trunc to window width 
+    if (msg.length() > static_cast<size_t>(window_.width)) // trunc to window width 
     {
         msg.resize(window_.width - 1);  
         msg += '\n';

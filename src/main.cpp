@@ -13,7 +13,11 @@
 #include "perf_hashtable.h"
 #include "grid.h"
 #include "streambuf.h" 
-#include "operators.h"
+#include "operators.h" 
+ 
+// you may define the delay here 
+#define MS_DELAY 100 
+
 
 int main(int nargs, char* args[]) { 
 
@@ -215,14 +219,16 @@ int main(int nargs, char* args[]) {
         }
 
         streamb.set_blocking(true); // some io commands need to block
- 
+  
+        
+        // resume interpreter and render
         interpreter.resume(); 
         gridop.render(interpreter);
         stackop.render(interpreter);  
         curop.render(interpreter);  
   
-        if (!stepping)
-            std::this_thread::sleep_for( std::chrono::milliseconds(100) );  
+        if (!stepping) 
+            std::this_thread::sleep_for( std::chrono::milliseconds(MS_DELAY) );  
 
     } while (!interpreter.done());  
 
