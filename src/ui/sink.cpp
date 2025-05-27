@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "sink.h"
 
 namespace ui {
@@ -31,10 +32,12 @@ void ui::sink_st::sink_it_(const spdlog::details::log_msg& msg) {
     window_.set_textcolor(color); 
     window_.print(name);
     used_width -= name.length();
-    window_.rem_textcolor(color);
+    window_.rem_textcolor(color); 
 
-    // print payload
-    window_.print( std::string_view(msg.payload.data(), used_width - 1) );
+    // print payload, trunc to window width
+    for (char c : std::string_view(msg.payload.data(), std::min(msg.payload.size(), static_cast<size_t>(used_width - 1) )) ) 
+        window_.putc(c);
+
     window_.putc('\n');
 
     window_.refresh();

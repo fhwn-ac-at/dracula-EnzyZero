@@ -40,10 +40,9 @@ i(GridBase& grid, [[maybe_unused]] Stack<stack_value_type>& s, [[maybe_unused]] 
  
     // get input
     log->info("Need input...");  
-    char c;
-    is >> c;
+    auto c = static_cast<signed char>(is.get());
  
-    log->info("Got input (hex): 0x{:02X}", c); 
+    log->info("Got input (hex): {:X}", static_cast<unsigned int>(c)); 
     grid.catpos( grid.cursor.y+1, grid.cursor.x ) = c;   
 
     return ok;
@@ -60,10 +59,9 @@ I(GridBase& grid, [[maybe_unused]] Stack<stack_value_type>& s, [[maybe_unused]] 
  
     // get input
     log->info("Need input...");  
-    char c;
-    is >> c;
+    auto c = static_cast<signed char>(is.get());
  
-    log->info("Got input (hex): 0x{:02X}", c); 
+    log->info("Got input (hex): {:X}", static_cast<unsigned int>(c)); 
     grid.catpos( grid.cursor.y-1, grid.cursor.x ) = c;   
 
     return ok;
