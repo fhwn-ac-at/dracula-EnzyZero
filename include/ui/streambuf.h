@@ -14,10 +14,15 @@ public:
     {}
 
     ~streambuf() override = default; 
-
+ 
+    /**
+     * @brief make io blocking/nonblocking.
+     */
     void set_blocking(bool b) { window_.set_nodelay(!b); }
 
-protected:
+protected: 
+
+    /* Below are some very straightforward hacks to get a streambuf that works with ncurses.*/
 
     int sync() override { window_.refresh(); return 0; }
 

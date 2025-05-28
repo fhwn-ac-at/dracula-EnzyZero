@@ -11,6 +11,12 @@
 
 namespace ui {
 
+/**
+ * @brief A subwindow is a derived ncurses window. 
+ *
+ * Essentially, It operates on some memory of the actual window. 
+ * It is an 'inner' window.
+ */
 class subwindow : public window_base { 
 public:
     
@@ -23,7 +29,8 @@ public:
     )
     :   window_base( derwin(win.window_, height, width, starty, startx) )
     {}
-
+ 
+    // this indents the subwidnow into the window one tile after the borders
     subwindow(window_base& win)
     :   window_base( derwin(win.window_, win.height-2, win.width-2, 1, 1) )
     {}
@@ -34,6 +41,9 @@ private:
     using window_base::window_;
 };
 
+/**
+ * @brief A window that owns its WINDOW* handle and may also have subwindows. 
+ */
 class window : public window_base { 
 public:
 
@@ -52,11 +62,24 @@ public:
 
     window& operator=(window&& other) noexcept;
 
-
+    /**
+     * @brief Create a subwindow with specific dimensions
+     * 
+     * @param height 
+     * @param width 
+     * @param starty 
+     * @param startx 
+     */
     void create_subwindow(int height, int width, int starty, int startx) {
         subwindows_.emplace_back(*this, height, width, starty, startx); 
     }
-
+ 
+    /**
+     * @brief Create an indented subwindow  
+     * 
+     * Useful for when you do not want to touch the borders and dont want
+     * to bother with setting the cursor correctly.
+     */
     void create_subwindow() {
         subwindows_.emplace_back(*this); 
     } 

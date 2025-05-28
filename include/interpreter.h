@@ -22,26 +22,37 @@ public:
     ) 
     :   grid_(grid), hasht_(hasht), istream_(istream), ostream_(ostream), logger_(logger), coro_(interpret())
     {}
-
+ 
+    /**
+     * @brief check if the underlying coro exists/is done
+     * 
+     * @return true 
+     * @return false 
+     */
     operator bool() { return !!coro_; }
     bool done() { return coro_.done(); }
-
+ 
+    /**
+     * @brief resume the underlying coro
+     * 
+     */
     void resume() { coro_.resume(); } 
     void operator()() { coro_(); }
 
     ~Interpreter() = default; 
 
-
 private:  
-    Stack<signed char> stack_;
+    Stack<signed char> stack_; // an interpreter owns a stack 
+
+    // but it uses a grid, hashtable, streams and a logger
     GridBase& grid_;
     const PerfHashtable<std::function<cmds::signature>>& hasht_;
     std::istream& istream_;
     std::ostream& ostream_;
     std::shared_ptr<spdlog::logger> logger_; 
 
-    Coroutine coro_;
-    Coroutine interpret();
+    Coroutine coro_; // return obj of interpret(), used to resume
+    Coroutine interpret(); // coroutine function
 
 public: // access points for ui::operators
     auto stack() -> decltype(stack_)& { return stack_; } 

@@ -6,15 +6,32 @@
 #include <spdlog/logger.h>
 #include "cursor.h"
 
+/**
+ * @brief Base for any grid, uses 7-Bit chars (signed)
+ * 
+ * Another derived will implement getting the grid from a file.
+ */
 class GridBase
 {
 public:
-    Cursor cursor{};
+    Cursor cursor{}; // a grid uses a cursor
 
     GridBase() = default;
-
+ 
+    /**
+     * @brief return the character at the cursors current position
+     * 
+     * @return signed char& 
+     */
     signed char &catcur() { return grid_.at(cursor.y).at(cursor.x); }
-
+ 
+    /**
+     * @brief return the character at the specified position in the grid
+     * 
+     * @param y height  
+     * @param x  width
+     * @return signed char& 
+     */
     signed char &catpos(const unsigned y, const unsigned x) { return grid_.at(y).at(x); } 
 
     virtual ~GridBase() = default;

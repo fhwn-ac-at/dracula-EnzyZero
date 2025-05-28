@@ -7,6 +7,10 @@
 
 namespace ui {
 
+/**
+ * Ncurses setup in a constructor and teardown in deconstructor. 
+ * Also has a window_base member with the stdscr.
+ */
 struct ncurses {
 
     ncurses() 
