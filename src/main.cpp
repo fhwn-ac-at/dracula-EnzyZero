@@ -189,7 +189,7 @@ int main(int nargs, char* args[]) {
             streamb.set_blocking(false);
   
         // process key inputs
-        if (char c = nc.get(); c != std::char_traits<char>::eof() )   
+        if (signed char c = nc.get(); c != std::char_traits<char>::eof() )   
         {
             switch (c)
             {
