@@ -1,7 +1,6 @@
 #ifndef commands_h
 #define commands_h 
 
-#include <functional>  
 #include <stdint.h>
 #include <iostream>
 #include <memory>

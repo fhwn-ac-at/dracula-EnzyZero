@@ -16,10 +16,10 @@
 #include "operators.h" 
  
 // you may define the delay here 
-#define MS_DELAY 100 
+#define MS_DELAY 100  
 
 
-int main(int nargs, char* args[]) { 
+int main(int nargs, char* args[]) {  
 
     /**
      * 1. Creating a logger for coloured output. 
@@ -218,9 +218,8 @@ int main(int nargs, char* args[]) {
             }  
         }
 
-        streamb.set_blocking(true); // some io commands need to block
-  
-        
+        streamb.set_blocking(true); // some io commands need to block 
+	
         // resume interpreter and render
         interpreter.resume(); 
         gridop.render(interpreter);
