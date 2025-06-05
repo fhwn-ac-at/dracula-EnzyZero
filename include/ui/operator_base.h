@@ -18,7 +18,11 @@ public:
     :   window_( window ),
         logger_( logger )
     {}
-
+ 
+    /**
+     * @brief Interface derivatives will override to render internals of an interpreter
+     * 
+     */
     virtual void render(Interpreter& interpreter) = 0;
 
     virtual ~OperatorBase() = default;

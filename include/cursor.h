@@ -18,7 +18,10 @@ struct Cursor {
     int y{};
     int x{};
     Direction dir{NONE};
-     
+      
+    /**  
+     * @brief get a clockwise or counter-clockwise rotation of a direction
+     */ 
     static constexpr Direction cw(Direction dir)  { return static_cast<Direction>(1 + (dir % 4)); } 
     static constexpr Direction ccw(Direction dir) { return static_cast<Direction>(1 + (dir + 2) % 4); } 
 

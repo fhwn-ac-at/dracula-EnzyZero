@@ -6,6 +6,11 @@
 #include <utility>
 #include <coroutine>
 
+/**
+ * @brief Minimal setup to get a c++ coroutine working
+ * It does not return anything (void) and manages the coroutine_handle. 
+ * The nested promise_type is necessary for the compiler.
+ */
 struct Coroutine {
 
     struct promise_type { 
@@ -36,10 +41,20 @@ struct Coroutine {
 
     Coroutine& operator=(Coroutine&& other) noexcept;
 
-
+    /**
+     * @brief Check if the coroutine exists/is done
+     * 
+     * @return true 
+     * @return false 
+     */
     operator bool() { return !!coro_; }
     bool done() { return coro_.done(); }
 
+    /**
+     * @brief resume the coroutine
+     * 
+     * Check if the coro is valid appropriately.
+     */
     void resume() { coro_.resume(); }
     void operator()() { resume(); }
 

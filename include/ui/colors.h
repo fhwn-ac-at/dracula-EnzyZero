@@ -20,6 +20,10 @@ enum color : int {
     BLUE_WHITE
 };
 
+/**
+ * @brief Initiate colors for ncurses
+ * 
+ */
 inline void init_colors() { 
 
     assert(!isendwin() && "ncurses must be initialised!");

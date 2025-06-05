@@ -29,14 +29,6 @@ public:
      */
     operator bool() { return !file_.fail(); } 
 
-    /**
-     * @brief access to the underlying grid_ stack arrays
-     * 
-     * @param i 
-     * @return decltype(grid_[0])& for type, look into grid_base
-     */
-    auto operator [](size_t i) noexcept -> decltype(grid_[0])& { return this->grid_[i]; }
-
     ~Grid() override = default;
  
 private: 
