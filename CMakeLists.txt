@@ -7,7 +7,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Set flags for each build type
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -DDEBUG_MODE")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG") 
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")  
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(TESTING "Option for building tests" OFF)
 
@@ -23,21 +24,18 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "CXX flags: ${CMAKE_CXX_FLAGS}")
 
 # Find libraries
-find_package(Curses REQUIRED)
 find_package(GTest REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(fmt REQUIRED)
+#find_package(Curses REQUIRED)
 
 # Dirs to resources
 set(INCLUDEDIR ${CMAKE_SOURCE_DIR}/include)
-set(UIINCLDIR  ${INCLUDEDIR}/ui)
 set(SRCDIR ${CMAKE_SOURCE_DIR}/src)
-set(UI_SRCDIR ${SRCDIR}/ui)
 set(TESTDIR ${CMAKE_SOURCE_DIR}/tests)
 
-# collect all cpp files in src and src/ui
+# collect all cpp files in src 
 file(GLOB SOURCES ${SRCDIR}/*.cpp)
-file(GLOB UI_SRC ${UI_SRCDIR}/*.cpp)
 
 # Tests are build if TESTING is on
 if(TESTING)
@@ -45,7 +43,6 @@ if(TESTING)
     include(CTest)
 
     message(STATUS "enable_testing(): Building Tests... run ctest to execute them once built")
-    message(STATUS "Header files from include/ui/ will not be included")
     enable_testing() 
 
     # Remove main.cpp and append all cpp files in test folder to sources
@@ -71,13 +68,13 @@ else() # not testing
 
     message(STATUS "Tests disabled") 
 
-    add_executable(dracula ${SOURCES} ${UI_SRC}) 
-    target_include_directories(dracula PRIVATE ${INCLUDEDIR} ${UIINCLDIR})  
+    add_executable(dracula ${SOURCES}) 
+    target_include_directories(dracula PRIVATE ${INCLUDEDIR})  
 
     target_link_libraries(dracula PRIVATE
-        Curses::Curses
         spdlog::spdlog
         fmt::fmt
+        #Curses::Curses
     )
 
 endif()
