@@ -27,7 +27,6 @@ message(STATUS "CXX flags: ${CMAKE_CXX_FLAGS}")
 find_package(GTest REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(fmt REQUIRED)
-find_package(cxxopts REQUIRED)
 #find_package(Curses REQUIRED)
 
 # Dirs to resources
@@ -58,8 +57,7 @@ if(TESTING)
         GTest::GTest
         GTest::gtest_main 
         spdlog::spdlog
-        fmt::fmt
-        cxxopts::cxxopts
+        fmt::fmt 
     )
 
     # automate registering tests to ctest
@@ -76,7 +74,6 @@ else() # not testing
     target_link_libraries(dracula PRIVATE
         spdlog::spdlog
         fmt::fmt
-        cxxopts::cxxopts
         #Curses::Curses
     )
 
