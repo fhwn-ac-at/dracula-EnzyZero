@@ -25,14 +25,14 @@ namespace board
   constexpr cmn::snakes_and_ladders_list_t<unsigned, cols, rows>
     snakes_and_ladders = {{
         
-    /* origin xy | dest xy  */
+   /* origin xy |  dest xy    */
       { {1, 1},   { 10, 10} }, 
 
     }};
 }  
 
 /** 
- * @brief speficy the faces and the weights (optional) of each of them 
+ * @brief specify the faces and the weights (optional) of each of them 
  *
  * The faces are self-explanatory.
  * 
