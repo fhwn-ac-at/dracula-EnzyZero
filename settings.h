@@ -8,14 +8,13 @@ namespace settings {
 /** 
  * @brief specify the dimensions of the board, snakes and ladders here
  * 
- *  The snakes_and_ladders list is a std::array with std::pairs. 
- *  Each pair specifies the absolute distance from the first field of the board to the origin
- *  and the destination.
- *
- *  @warning This means that THESE ARE NO X/Y Coordinates
+ *  The snakes_and_ladders list is a std::array with a pair of two vectors. 
+ *  Each pair specifies the xy coords o the origin and the destination with the lower left corner of the board being
+ *  the start of the kartesian coordinate sytem.
  *  
- *  E.g. {10, 20} means that this ladder begins at field 10 and ends at field 20, with 
- *  **1 being the first field** 
+ *  @warning **coords start at 1!** for convenience
+ *
+ *  The goal of the board is at the opposite of the beginning, so in the upper right corner relative to the origin.
  */
 namespace board 
 { 
@@ -23,12 +22,11 @@ namespace board
   constexpr unsigned cols = 10;
   constexpr unsigned rows = 10; 
  
-  constexpr common::snakes_and_ladders_list_t<cols, rows>
+  constexpr cmn::snakes_and_ladders_list_t<unsigned, cols, rows>
     snakes_and_ladders = {{
-
-      {10, 20},
-      {30, 80},
-      {99, 5} 
+        
+    /* origin xy | dest xy  */
+      { {1, 1},   { 10, 10} }, 
 
     }};
 }  
@@ -48,7 +46,7 @@ namespace board
 namespace dice 
 {
   constexpr unsigned faces = 6; 
-  constexpr common::dice_weights_list_t<faces> weights = {};
+  constexpr cmn::dice_weights_list_t<unsigned, faces> weights = {};
 }
 
 } // settings namespace 

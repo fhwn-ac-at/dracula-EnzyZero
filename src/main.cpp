@@ -1,14 +1,21 @@
 #include <fmt/core.h>
+#include <spdlog/spdlog.h> 
+
 #include "../settings.h"  
-#include "board_init.h"
+#include "snakes_ladders_board.h"
 
-// well thats one horrible line of code
-constexpr common::board_t<settings::board::cols, settings::board::rows>
-  board = board_init<settings::board::cols, settings::board::rows>(settings::board::snakes_and_ladders);   
+using namespace settings::board;
+using SLBoard = SnakesLaddersBoard<unsigned, cols, rows>;
 
-int main() {
+constexpr SLBoard board = SLBoard::init_board(snakes_and_ladders);    
 
-  fmt::print("Board at 10 = {}", board[10]); 
+int main() {    
 
+  spdlog::set_pattern("[%^%l%$] %v");
+
+  if constexpr (!board)
+    spdlog::error("BOARD::INIT::ERROR Board could not be created at compile-time, check your coordinates");
+  else
+    spdlog::info("BOARD::INIT::SUCCESSFUL Board was loaded at compile-time");
 
 }
