@@ -13,15 +13,17 @@ class Board {
 
 public: 
 
+  const size_t max_field_pos;  
+
   constexpr Board(const std::initializer_list<T>& list) 
-  : _arr{}, _init(true)
+  : _arr{}, _init(true), max_field_pos(_arr.max_size())
   {
     std::copy(list.begin(), list.end(), _arr.begin());
   } 
  
   // may be used as a means to mark an error 
   constexpr Board() 
-  : _arr{}, _init(false)
+  : _arr{}, _init(false), max_field_pos(_arr.max_size())
   {}  
 
   constexpr Board(Board& other) = default;
