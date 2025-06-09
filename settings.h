@@ -25,7 +25,7 @@ namespace board
   constexpr cmn::snakes_and_ladders_list_t<unsigned, cols, rows>
     snakes_and_ladders = {{
         
-   /* origin xy |  dest xy    */
+   /* origin xy |  dest xy     */
       { {1, 1},   { 10, 10} }, 
 
     }};
