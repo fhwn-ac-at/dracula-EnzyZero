@@ -7,16 +7,21 @@
 #include "../settings.h"  
 #include "common.h"
 #include "snakes_ladders_board.h"
+#include "dice_setup.h"
 
 using namespace settings::board;
 using SLBoard = SnakesLaddersBoard<cmn::board_int_t, cols, rows>;
 
-constexpr SLBoard board = SLBoard::init_board(snakes_and_ladders);    
 
 int main(int argc, char* argv[]) {
 
+  // crate board and init weights at compile-time
+  constexpr SLBoard board = SLBoard::init_board(snakes_and_ladders);
+  constexpr decltype(settings::dice::weights) dice_weights = dice::weight_generator(settings::dice::weights);
+
   spdlog::set_pattern("[%^%l%$] %v");
 
+  // check for success
   if constexpr (!board)
   {
     spdlog::error("BOARD::INIT::ERROR Board could not be created at compile-time, check your settings.h");
