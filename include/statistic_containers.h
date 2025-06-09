@@ -6,7 +6,18 @@
 #include <compare> 
 
 #include "common.h"
-#include "../settings.h"
+#include "../settings.h" 
+
+struct GameStats {
+
+  unsigned rolls{};
+  std::vector<int> roll_sequence; 
+
+  void reset() { rolls = 0; roll_sequence.clear(); }
+
+  bool operator==(const GameStats& other) const                  { return rolls ==  other.rolls; }
+  std::strong_ordering operator<=>(const GameStats& other) const { return rolls <=> other.rolls; }
+};
 
 struct ThreadResult {  
 
@@ -15,16 +26,7 @@ private:
   static constexpr int estimate_rolls = (settings::board::cols * settings::board::rows) / settings::dice::faces; 
 
 public: 
-    struct ShortestGame {
-
-      unsigned rolls{};
-      std::vector<int> roll_sequence; 
-
-      void reset() { rolls = 0; roll_sequence.clear(); }
-
-      bool operator==(const ShortestGame& other) const                  { return rolls ==  other.rolls; }
-      std::strong_ordering operator<=>(const ShortestGame& other) const { return rolls <=> other.rolls; }
-    };
+    
 
   ThreadResult()
   : avrg_rolls{}, snakes_ladders_hits{}
@@ -36,7 +38,7 @@ public:
   
   double avrg_rolls;
   std::unordered_map<cmn::board_int_t, unsigned> snakes_ladders_hits;
-  ShortestGame shortest_game;
+  GameStats shortest_game;
 
 };
 
