@@ -21,8 +21,6 @@ namespace cmn {
   template<std::integral T, std::size_t F>
   using dice_weights_list_t = std::array<T, F>; 
 
-  
-
 } // cmn namespace 
 
 #endif
