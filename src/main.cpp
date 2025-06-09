@@ -2,13 +2,14 @@
 #include <spdlog/spdlog.h> 
 #include <argparse/argparse.hpp>
 #include <ctime>
-#include <thread>
+#include <atomic>
 
 #include "../settings.h"  
+#include "common.h"
 #include "snakes_ladders_board.h"
 
 using namespace settings::board;
-using SLBoard = SnakesLaddersBoard<unsigned, cols, rows>;
+using SLBoard = SnakesLaddersBoard<cmn::board_int_t, cols, rows>;
 
 constexpr SLBoard board = SLBoard::init_board(snakes_and_ladders);    
 
@@ -92,6 +93,8 @@ int main(int argc, char* argv[]) {
 
   spdlog::info("Seed used: {}", seed);
   spdlog::info("Starting the simulator. Running {} times on {} threads for {} milliseconds", runs, threads, time ? std::to_string(time) : "infinite"); 
+
+  std::atomic_int at_runs = runs;
 
   // Todo signal handler?
 
