@@ -1,4 +1,4 @@
-#include <fmt/core.h>
+#include <fmt/core.h> 
 #include <spdlog/spdlog.h> 
 #include <argparse/argparse.hpp>
 #include <ctime>
@@ -7,16 +7,13 @@
 #include "../settings.h"  
 #include "common.h"
 #include "snakes_ladders_board.h"
-#include "dice_setup.h"
+#include "dice.h"
 
-using namespace settings::board;
-using SLBoard = SnakesLaddersBoard<cmn::board_int_t, cols, rows>;
-
-
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) { 
+  using SLBoard = SnakesLaddersBoard<cmn::board_int_t, settings::board::cols, settings::board::rows>;
 
   // crate board and init weights at compile-time
-  constexpr SLBoard board = SLBoard::init_board(snakes_and_ladders);
+  constexpr SLBoard board = SLBoard::init_board(settings::board::snakes_and_ladders);
   constexpr decltype(settings::dice::weights) dice_weights = dice::weight_generator(settings::dice::weights);
 
   spdlog::set_pattern("[%^%l%$] %v");
