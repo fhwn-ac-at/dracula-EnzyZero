@@ -1,7 +1,8 @@
 #ifndef settings_h 
 #define settings_h 
 
-#include "common.h"
+#include "dice.h"
+#include "snakes_ladders_list.h"
 
 namespace settings { 
 
@@ -22,7 +23,7 @@ namespace board
   constexpr unsigned cols = 10;
   constexpr unsigned rows = 10; 
  
-  constexpr cmn::snakes_and_ladders_list_t<unsigned, cols, rows>
+  constexpr snakes_and_ladders::list::type<unsigned, cols, rows>
     snakes_and_ladders = {{
         
    /* origin xy |  dest xy     */
@@ -46,7 +47,7 @@ namespace board
 namespace dice 
 {
   constexpr unsigned faces = 6; 
-  constexpr cmn::dice_weights_list_t<unsigned, faces> weights = {};
+  constexpr ::dice::weights_list_t<unsigned, faces> weights = {};
 }
 
 } // settings namespace 
