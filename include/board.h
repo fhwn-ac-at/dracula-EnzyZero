@@ -13,23 +13,22 @@ class Board {
 
 public: 
 
-
   constexpr Board(const std::initializer_list<T>& list) 
-  : _max_field_pos(_arr.max_size()), _arr{}, _init(true)
+  : _arr{}, _init(true), _max_field_pos(_arr.max_size() -1) 
   {
     std::copy(list.begin(), list.end(), _arr.begin());
   } 
  
   // may be used as a means to mark an error 
   constexpr Board() 
-  : _max_field_pos(_arr.max_size()), _arr{}, _init(false)
+  : _arr{}, _init(false), _max_field_pos(_arr.max_size() -1)
   {}  
 
   constexpr Board(Board& other) = default;
   constexpr Board& operator=(Board& other) = default;  
 
   constexpr Board(Board&& other) noexcept 
-  : _max_field_pos(other._max_field_pos), _arr( std::exchange(other._arr, {}) ), _init( std::exchange(other._init, false) )
+  : _arr( std::exchange(other._arr, {}) ), _init( std::exchange(other._init, false) ), _max_field_pos(other._max_field_pos) 
   {}
    
   constexpr Board& operator=(Board&& other) noexcept {
@@ -70,9 +69,9 @@ public:
   constexpr T& operator[](size_t i) noexcept { return _arr[i]; } 
 
 protected: 
-  size_t _max_field_pos;
   std::array<T, C * R> _arr;
   bool _init;
+  size_t _max_field_pos;
 }; 
  
 
