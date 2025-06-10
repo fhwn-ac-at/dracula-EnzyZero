@@ -10,8 +10,8 @@ namespace cmn {
   
   template <std::integral T> 
   struct vector {
-    T y{};
     T x{}; 
+    T y{};
 
     constexpr bool is_null() const { return y == 0 && x == 0; }
   };
