@@ -1,13 +1,15 @@
 #ifndef board_init_h
 #define board_init_h
 
-#include "board.h"
-#include "common.h"
-#include "snakes_ladders_list.h"
 #include <initializer_list> 
 #include <format>
 #include <stdexcept>
 #include <algorithm>
+
+#include "board.h"
+#include "common.h"
+#include "snakes_ladders_list.h"
+
 
 template <std::integral T, size_t C = 10, size_t R = 10> 
 class SnakesLaddersBoard : public Board<T, C, R> {  
@@ -67,26 +69,15 @@ constexpr SnakesLaddersBoard<T, C, R>::SnakesLaddersBoard(const std::initializer
 template <std::integral T, size_t C, size_t R>
 consteval auto SnakesLaddersBoard<T, C, R>::init_board(const snakes_and_ladders::list::type<T, C, R>& list) -> SnakesLaddersBoard<T, C, R> {
 
-  using vec_pair = decltype(list)::value_type;
- 
   SnakesLaddersBoard<T, C, R> ret_board;  
-  ret_board.valid(false); 
-  
-  // helper
-  auto check_vec = [](cmn::vector<T> vec) -> bool { return vec.x <= 0 || vec.x > C || vec.y <= 0 || vec.y > R; };
+  ret_board.valid(false);  
 
-  // get an iterator to the first empty snake or ladder
-  auto last_snake_or_ladder_it = std::ranges::find_if(list, [](const vec_pair& pair) { 
-    return pair.first.is_null() && pair.second.is_null(); 
-  });
-  
-  // check if any of the coordinates are out of range, abort baord if yes
-  if (std::ranges::any_of(list.begin, last_snake_or_ladder_it, [](const vec_pair& pair) { return check_vec(pair.first) || check_vec(pair.second); })) 
+  if (!snakes_and_ladders::list::is_valid<T, C, R>(list))
     return ret_board;
-
+  
   for(const auto [ abs_origin, abs_dest ] : snakes_and_ladders::list::to_absolute_positions<T, C, R>(list)) 
   {   
-    // save the absolute index of the destination to this field
+    // save the absolute index of the destination to an origin field 
     ret_board[abs_origin] = abs_dest;  
   } 
   
