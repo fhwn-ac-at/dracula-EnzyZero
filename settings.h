@@ -16,9 +16,12 @@ namespace settings {
  *  @warning **coords start at 1!** for convenience
  *
  *  The goal of the board is at the opposite of the beginning, so in the upper right corner relative to the origin.
+ *  You may change the "goal_hit_exact" bool to set whether the a win is defined by hitting the goal exactly.
+ *  If it is set to false, overshooting the goal will be a win as well.
  */
 namespace board 
-{ 
+{  
+  constexpr bool goal_hit_exact = true;
   
   constexpr unsigned cols = 10;
   constexpr unsigned rows = 10; 
