@@ -1,9 +1,6 @@
 #ifndef board_init_h
 #define board_init_h
 
-#include <format>
-#include <stdexcept>
-
 #include "board_base.h"
 #include "snakes_ladders_list.h"
 
@@ -26,7 +23,7 @@ private:
 
 template <std::integral T, size_t C, size_t R>
 constexpr board<T, C, R>::board(const snakes_and_ladders::list<T, C, R>& list)
-: _base::_arr{}, _base::_init( false )
+: _base{}
 { 
     assert(list && "List is invalid");
 
@@ -40,13 +37,9 @@ constexpr board<T, C, R>::board(const snakes_and_ladders::list<T, C, R>& list)
       if (_base::_arr.at(abs_origin) != 0 || 
           _base::_arr.at(abs_dest)   != 0 ||
           used_dest.at(abs_dest)     != 0)
-      { 
-        throw std::logic_error(std::format(
-          "STUPID::SNAKES::LADDER::PLACEMENT duplicate origin: {0} destination is an origin: {1} duplicate destination: {2}", 
-          _base::_arr.at(abs_origin) == 0,
-          _base::_arr.at(abs_dest)   == 0,
-          used_dest.at(abs_dest)     == 0)
-        ); 
+      {  
+        _base::_init = false;
+        return;
       } 
 
       // save the absolute index of the destination to an origin field 

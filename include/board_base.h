@@ -11,7 +11,7 @@
 template <std::integral T, size_t C = 10, size_t R = 10>
 class board_base { 
 
-public: 
+public:
 
   constexpr board_base(const std::initializer_list<T>& list) 
   : _arr{}, _init(true), _max_field_pos(_arr.max_size() -1) 
@@ -22,7 +22,7 @@ public:
   // may be used as a means to mark an error 
   constexpr board_base() 
   : _arr{}, _init(false), _max_field_pos(_arr.max_size() -1)
-  {}  
+  {}
 
   constexpr board_base(board_base& other) = default;
   constexpr board_base& operator=(board_base& other) = default;  

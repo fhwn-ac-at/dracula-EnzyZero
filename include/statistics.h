@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <numeric>
 #include <compare>
+#include <span>
 
 struct Statistics {
 
@@ -51,7 +52,8 @@ private:
 
   std::unordered_map<size_t /* snake/ladder pos */, unsigned /* hit count */>
     _snake_ladder_hit_map;
-
+ 
+  template <size_t K>
   friend class StatisticsCollectorFactory;
 }; 
 

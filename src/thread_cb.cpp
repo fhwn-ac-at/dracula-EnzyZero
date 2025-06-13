@@ -4,7 +4,7 @@
 #include <future>
 
 #include "board_base.h"
-#include "statisics.h"
+#include "statistics.h"
 #include "dice.h"
 #include "game.h"
 

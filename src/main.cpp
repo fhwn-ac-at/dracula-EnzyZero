@@ -5,7 +5,6 @@
 #include <atomic>
 
 #include "../settings.h"  
-#include "common.h"
 #include "snakes_ladders_board.h" 
 
 int main(int argc, char* argv[]) {  
@@ -13,12 +12,12 @@ int main(int argc, char* argv[]) {
   using namespace settings;
 
   // crate board and init weights at compile-18:27
-  constexpr snakes_and_ladders::board<unsigned, board::cols, board::rows> board(board::snakes_and_ladders);
+  const snakes_and_ladders::board<unsigned, board::cols, board::rows> board(board::snakes_and_ladders);
 
   spdlog::set_pattern("[%^%l%$] %v");
 
   // check for success
-  if constexpr (!board)
+  if (!board)
   {
     spdlog::error("BOARD::INIT::ERROR Board could not be created at compile-time, check your settings.h");
     return 1;
@@ -95,7 +94,7 @@ int main(int argc, char* argv[]) {
   spdlog::info("Seed used: {}", seed);
   spdlog::info("Starting the simulator. Running {} times on {} threads for {} milliseconds", runs, threads, time ? std::to_string(time) : "infinite"); 
 
-  std::atomic_int at_runs = runs;
+  //std::atomic_int at_runs = runs;
 
   // TODO signal handler?
 }

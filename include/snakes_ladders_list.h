@@ -16,20 +16,21 @@ namespace snakes_and_ladders {
 template <std::integral T, size_t C, size_t R>
 class list : public std::array<std::pair<vec<T>, vec<T>>, (C * R) / 2 - 2> { 
 
-  using _array = typename std::array<std::pair<vec<T>, vec<T>>, (C * R) / 2 - 2>;
-  using _vec_pair = typename _array::value_type;
+  static constexpr size_t _Max = (C * R) / 2 - 2;
+  using _array = typename std::array<std::pair<vec<T>, vec<T>>, _Max>;
+  using _vec_pair = typename _array::value_type; 
 
 public:
 
-  constexpr list(std::initializer_list<_vec_pair>& list);
+  constexpr list(std::initializer_list<_vec_pair> list);
 
   constexpr operator bool() const { return _valid; }
   constexpr bool is_valid() const { return operator bool(); }
 
-  constexpr auto to_abs_positions() -> std::array<std::pair<T, T>, this->size()>;
+  constexpr auto to_abs_positions() const -> std::array<std::pair<T, T>, _Max>;
 
 private:
-  bool _check_vec(vec<T>& vec) { return vec.x <= 0 || vec.x > C || vec.y <= 0 || vec.y > R; } 
+  bool _check_vec(const vec<T>& vec) { return vec.x <= 0 || vec.x > C || vec.y <= 0 || vec.y > R; } 
 
   const _array::const_iterator _last_it;
   bool _valid;
@@ -38,36 +39,49 @@ private:
 
 
 template <std::integral T, size_t C, size_t R>
-constexpr list<T, C, R>::list(std::initializer_list<_vec_pair>& list) 
-  : _array( list ), 
-  _last_it( std::ranges::find_if(*this, [](const _vec_pair& pair) { return pair.first.is_null() && pair.second.is_null(); }) ), 
-  _valid(false)
-{
+constexpr list<T, C, R>::list(std::initializer_list<_vec_pair> list) 
+  : _array{}, 
+    _last_it( std::ranges::find_if(*this, [](const _vec_pair& pair) { return pair.first.is_null() && pair.second.is_null(); }) ), 
+    _valid(false)
+{ 
+  std::copy(list.begin(), list.end(), this->begin());
+
   // zero out array if any of the vectors are out of bounds
   if ( !std::ranges::all_of(this->begin(), _last_it, [this](const _vec_pair& pair) { return _check_vec(pair.first) && _check_vec(pair.second); } ))
-    std::ranges::fill(*this, {});
+    std::ranges::fill(*this, _vec_pair{});
   else
-    _valid = true;
+    _valid = true; 
 }
 
 template <std::integral T, size_t C, size_t R>
-constexpr auto list<T, C, R>::to_abs_positions() -> std::array<std::pair<T, T>, this->size()> 
+constexpr auto list<T, C, R>::to_abs_positions() const -> std::array<std::pair<T, T>, _Max> 
 {  
   assert(is_valid() && "this list is not valid");  
 
   // 1. the code below first takes n elemenst which are not empty 
   // 2. decrements the vector parts (needed for converting to absolute distance, which begins at 0 not 1)
   // 3. sum the vectors coords together (first = first.x + first.y etc...)
-  return *this
+  auto view = *this
   | std::ranges::views::take_while([](const _vec_pair& pair) {
     return !pair.first.is_null() || !pair.second.is_null(); 
   })
   | std::ranges::views::transform([](const _vec_pair& pair) {
-    return vec_pair( { .x = pair.first.x -1, .y = pair.first.y -1}, { .x = pair.second.x -1, .y = pair.second.y -1} );
+    return _vec_pair( 
+        { .x = pair.first.x -1, .y = pair.first.y -1}, 
+        { .x = pair.second.x -1, .y = pair.second.y -1} 
+      );
   })
   | std::ranges::views::transform([](const _vec_pair& pair) { 
-    return abs_pair(pair.first.y * R + pair.first.x, pair.second.y * R + pair.second.x);
-  }); 
+    return std::pair<T, T>(
+        pair.first.y * R + pair.first.x, 
+        pair.second.y * R + pair.second.x
+      );
+  });  
+ 
+  // copy view
+  std::array<std::pair<T, T>, _Max> ret{};
+  std::ranges::copy(view.begin(), view.end(), ret.begin()); 
+  return ret;
 }
 
 } // snakes_and_ladders namespace 

@@ -28,7 +28,7 @@ namespace board
   constexpr unsigned rows = 10; 
  
   constexpr snakes_and_ladders::list<unsigned, cols, rows>
-    snakes_and_ladders {
+    snakes_and_ladders = {
         
    /* origin xy |  dest xy     */
       { {1, 1},   { 10, 10} }, 
