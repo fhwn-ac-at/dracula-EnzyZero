@@ -5,11 +5,10 @@
 #include <unordered_map>
 #include <compare> 
 
-#include "common.h"
 #include "snakes_ladders_list.h"
 #include "../settings.h" 
 
-struct GameStats {
+struct Game {
 
   unsigned rolls{};
   std::vector<int> roll_sequence; 
