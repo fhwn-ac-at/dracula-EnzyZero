@@ -3,14 +3,14 @@
 
 #include <algorithm>
 #include <random>
-#include <initializer_list> 
+#include <span> 
 #include <time.h>
 
 template<std::integral T, std::size_t F>
-class dice {
+class Dice {
 
-public:  
-  constexpr dice(size_t seed = time(nullptr), std::initializer_list<T>& list = {}) 
+public:
+  constexpr Dice(size_t seed = time(nullptr), std::span<T> list = {}) 
   : _gen( seed ), _d( _default_weights(list) )
   {
     static_assert(list.size() == F || list.size() == 0, "List must be equal to faces (F) of the dice or empty");
