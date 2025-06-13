@@ -3,6 +3,7 @@
 
 #include "dice.h"
 #include "snakes_ladders_list.h"
+#include <initializer_list>
 
 namespace settings { 
 
@@ -26,13 +27,13 @@ namespace board
   constexpr unsigned cols = 10;
   constexpr unsigned rows = 10; 
  
-  constexpr snakes_and_ladders::list::type<unsigned, cols, rows>
-    snakes_and_ladders = {{
+  constexpr snakes_and_ladders::list<unsigned, cols, rows>
+    snakes_and_ladders {
         
    /* origin xy |  dest xy     */
       { {1, 1},   { 10, 10} }, 
 
-    }};
+    };
 }  
 
 /** 
@@ -50,7 +51,7 @@ namespace board
 namespace dice 
 {
   constexpr unsigned faces = 6; 
-  constexpr ::dice::weights_list_t<unsigned, faces> weights = {};
+  constexpr std::array<unsigned, faces> weights = {};
 }
 
 } // settings namespace 

@@ -6,15 +6,14 @@
 
 #include "../settings.h"  
 #include "common.h"
-#include "snakes_ladders_board.h"
-#include "dice.h"
+#include "snakes_ladders_board.h" 
 
-int main(int argc, char* argv[]) { 
-  using SLBoard = SnakesLaddersBoard<cmn::board_int_t, settings::board::cols, settings::board::rows>;
+int main(int argc, char* argv[]) {  
 
-  // crate board and init weights at compile-time
-  constexpr SLBoard board = SLBoard::init_board(settings::board::snakes_and_ladders);
-  constexpr decltype(settings::dice::weights) dice_weights = dice::weight_generator(settings::dice::weights);
+  using namespace settings;
+
+  // crate board and init weights at compile-18:27
+  constexpr snakes_and_ladders::board<unsigned, board::cols, board::rows> board(board::snakes_and_ladders);
 
   spdlog::set_pattern("[%^%l%$] %v");
 
@@ -98,6 +97,5 @@ int main(int argc, char* argv[]) {
 
   std::atomic_int at_runs = runs;
 
-  // Todo signal handler?
-
+  // TODO signal handler?
 }
