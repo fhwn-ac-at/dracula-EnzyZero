@@ -1,97 +1,50 @@
 #include <assert.h>
-#include <vector>
 #include <atomic> 
 #include <stop_token>
-#include <random>
 #include <future>
-#include <numeric>
 
-#include "../settings.h"
-#include "common.h"
-#include "board.h"
-#include "statistic_containers.h"
+#include "board_base.h"
+#include "statisics.h"
+#include "dice.h"
+#include "game.h"
 
-using namespace settings;
+template <typename T, size_t C, size_t R, size_t F>
+void task(std::stop_token              st, // supplied by jthread constructor
+          std::atomic_int&             global_runs_count,
+          const int                    assigned_runs, 
+          const size_t                 mixed_seed,
+          const std::span<T>           weights_list,
+          const board_base<T, C, R>&   board,
 
-void task(std::stop_token                          st, // supplied by jthread constructor
-          std::atomic_int&                         global_runs_count,
-          const int                                assigned_runs, 
-          const int                                mixed_seed,
-          const decltype(settings::dice::weights)& weights,
-          const Board<cmn::board_int_t, 
-            board::cols, board::rows>&             board,
-          std::promise<ThreadResult>               promise
+          StatisticsCollector&&        mcollector,
+          std::promise<Statistics>     promise
       )
 {
-  assert(board && assigned_runs >= 0 && "Board is invalid"); 
+  assert(board && assigned_runs >= 0 && "Board is invalid");  
 
-  // create a rand device
-  std::mt19937 gen(mixed_seed);
-  std::discrete_distribution d(weights.cbegin(), weights.cend()); 
+  using Game = Game<T, C, R, F>;
 
-  ThreadResult result;
-  GameStats game;  
-
-  std::vector<double> avrg_game_rolls;
-  avrg_game_rolls.reserve(assigned_runs);
-
-  // outer loop for each game
+  Dice dice(mixed_seed, weights_list);
+  Game game(board, std::move(dice));
+  StatisticsCollector collector = std::move(mcollector);
+   
+  // add collector methods as
+  game.add_event_handler(Game::ROLL_EVENT, std::bind(&StatisticsCollector::add_roll, &collector, std::placeholders::_1)); 
+  game.add_event_handler(Game::SNAKE_LADDER_HIT_EVENT, std::bind(&StatisticsCollector::add_snake_ladder_hit, &collector, std::placeholders::_1)); 
+  game.add_event_handler(Game::WON_EVENT, std::bind(&StatisticsCollector::finalize, &collector)); 
+ 
+  // the game-loop
   for(int runs = 0; runs < assigned_runs && !st.stop_requested(); runs++, global_runs_count--) 
   { 
     // inner game loop for steps in a game
-    for (int roll = d(gen), pos = 0, last_pos = 0; !st.stop_requested(); roll = d(gen))
-    {
-      game.rolls++;
-      game.roll_sequence.push_back(roll);  
-
-      // if overshoots are not allowed, save last position
-      if constexpr (settings::board::goal_hit_exact)
-        last_pos = pos;
-
-      // set new position
-      if (unsigned field = board[pos]; field != 0)
-      {
-        pos += field;
-        result.snakes_ladders_hits.at(field)++; 
-      } 
-      else
-        pos++;
-
-      // decide between the two win-strategies
-      if constexpr (settings::board::goal_hit_exact) 
-      {
-        if (static_cast<size_t>(pos) == board.max_field_pos()) 
-          break;
-        else
-          pos = last_pos;
-      }
-      else 
-      {
-        if (static_cast<size_t>(pos) >= board.max_field_pos())
-          break;
-      }
-    }
+    while (!st.stop_requested() && !game.won())
+      game.roll();
     
-    // save avrg rolls of a game
-    const double avrg = std::accumulate(game.roll_sequence.begin(), game.roll_sequence.end(), 0) / static_cast<double>(game.rolls); 
-    avrg_game_rolls.push_back(avrg);
-
-    // save game stats if new minimum found
-    if (game < result.shortest_game)
-    {
-      result.shortest_game = std::move(game);
-      game.roll_sequence.reserve(avrg);
-    }
-
     game.reset();
   }
 
   if (!st.stop_requested())
     return;
 
-  // calculate the average rolls of all games 
-  const double avrg = std::accumulate(avrg_game_rolls.begin(), avrg_game_rolls.end(), 0) / static_cast<double>(assigned_runs); 
-  result.avrg_rolls = avrg; 
-  
-  promise.set_value(std::move(result));
+  promise.set_value(collector.get_results());
 }
