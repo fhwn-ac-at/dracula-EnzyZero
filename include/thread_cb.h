@@ -17,7 +17,7 @@
 template <typename T, unsigned C, unsigned R, unsigned F, std::ranges::input_range r>
 void task(std::stop_token                  st, // supplied by jthread constructor
           std::shared_ptr<spdlog::logger>  logger,
-          std::atomic_int&                 global_runs_count,
+          std::atomic_size_t&              global_runs_count,
           const int                        assigned_runs, 
           const size_t                     mixed_seed,
           r&&                              weights_list,
@@ -28,7 +28,7 @@ void task(std::stop_token                  st, // supplied by jthread constructo
       )
 {
 
-  assert(board && assigned_runs >= 0 && "Board is invalid"); 
+  assert(board && assigned_runs >= 0 && "Board is invalid");
 
   const int thread_id = gettid();
   logger->info("Thread [{}]: running {} games with mixed_seed {}", thread_id, assigned_runs, mixed_seed);
@@ -57,13 +57,11 @@ void task(std::stop_token                  st, // supplied by jthread constructo
     game.reset();
   }
 
-  if (!st.stop_requested())
-  {
-    logger->info("Thread [{}] stopped", thread_id);
-    return;
-  }
+  if (st.stop_requested())
+    logger->debug("Thread [{}] stopped", thread_id);
+  else 
+    logger->debug("Thread [{}] finished normally", thread_id);
 
-  logger->debug("Thread [{}] finished", thread_id);
   promise.set_value(collector.get_results());
 }
 
