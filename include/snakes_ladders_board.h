@@ -37,9 +37,9 @@ constexpr board<T, C, R>::board(const snakes_and_ladders::list<T, C, R>& list)
     for(const auto [ abs_origin, abs_dest ] : list.to_abs_positions() | std::ranges::views::take_while(is_not_empty_pair)) 
     { 
       // check for false snakes or ladder placement
-      if (_base::_arr.at(abs_origin) != 0 || 
-          _base::_arr.at(abs_dest)   != 0 ||
-          used_dest.at(abs_dest)     != 0)
+      if (_base::_arr[abs_origin] != 0 || 
+          _base::_arr[abs_dest]   != 0 ||
+          used_dest[abs_dest]     != 0)
       {  
         _base::_init = false;
         return;
