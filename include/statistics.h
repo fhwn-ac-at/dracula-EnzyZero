@@ -2,6 +2,7 @@
 #define statistics_collector_h
 
 #include <cwchar>
+#include <iterator>
 #include <vector>
 #include <unordered_map>
 #include <numeric>
@@ -22,7 +23,34 @@ struct Statistics {
 
 template <std::integral T>
 class StatisticsCollector {
-public:
+public: 
+
+  StatisticsCollector() = default;
+ 
+  template <std::ranges::input_range R>
+  requires std::same_as<Statistics<T>, std::ranges::range_value_t<R>>
+  StatisticsCollector(R&& statistics)
+  {
+    // insert all the avrg of the Statistics into _all_game_roll_counts
+    auto avrg_view = statistics | std::views::transform([](const auto& stats) { return stats.avrg_rolls; });
+    _all_game_roll_counts.reserve(std::ranges::size(avrg_view));
+    std::ranges::copy(avrg_view, std::back_inserter(_all_game_roll_counts));
+     
+    // find and move from the shortest game's roll sequence 
+    auto shortest_game_view = statistics | std::views::transform([](const auto& stats) { return stats.shortest_game_rolls; });
+    auto shortest_game_it = std::ranges::min_element(shortest_game_view, [](const auto& left_vec, const auto& right_vec) { return left_vec.size() < right_vec.size(); });
+    _shortest_game_roll_seq = std::move( *shortest_game_it );
+
+    // add all the snakes and ladders hits into this map
+    for(const auto& stat : statistics)
+    {
+      const auto& map = stat.snakes_ladders_hits;
+      for (const auto& pair: map)
+      {
+        _snake_ladder_hit_map.insert(pair);
+      }
+    }
+  }
 
   void add_roll(const T roll) { _current_game_roll_seq.push_back(roll); }
 
@@ -49,7 +77,8 @@ public:
       .snakes_ladders_hits = std::move(_snake_ladder_hit_map)
     };
   }
- 
+
+
 private:
   std::vector<T> _current_game_roll_seq;
   std::vector<T> _shortest_game_roll_seq;
