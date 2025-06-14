@@ -5,7 +5,10 @@
 #include <assert.h>
 #include <board_base.h>
 #include <dice.h>
+#include <memory>
 #include <variant>
+#include <spdlog/logger.h>
+#include <spdlog/sinks/null_sink.h>
 
 template <typename Cb>
 concept EventCallback =
@@ -15,10 +18,12 @@ concept EventCallback =
 
 template <std::integral T, size_t C, size_t R, size_t F, bool goal_hit_exact = false> 
 class Game {
-public: 
+public:
 
-  constexpr Game(const board_base<T, C, R>& board, Dice<T, F>&& d)
-  : _board( board ), _board_max_pos( board.max_field_pos() ), _d( std::move(d) ), _won( false )
+  Game(const board_base<T, C, R>& board, Dice<T, F>&& d, std::shared_ptr<spdlog::logger> logger =
+         std::make_shared<spdlog::logger>("", std::make_shared<spdlog::sinks::null_sink_mt>()))
+
+  : _board( board ), _board_max_pos( board.max_field_pos() ), _d( std::move(d) ), _won( false ), _logger( std::move(logger) )
   { 
     assert(_board.valid() && "Board is invalid");
   }
@@ -28,7 +33,7 @@ public:
   bool won() const { return _won; }
   operator bool() const { return won(); } 
 
-  void reset() { _won = false; _pos = 0; } 
+  void reset() { _won = false; _pos = 0; _logger->debug("Game reset"); } 
 
   static constexpr int events = 3; 
   enum event : int {
@@ -47,7 +52,8 @@ private:
   Dice<T, F> _d;
 
   size_t _pos{};
-  bool _won; 
+  bool _won;
+  std::shared_ptr<spdlog::logger> _logger;
   
   using _event_arg_t = std::variant<size_t, unsigned, std::monostate>;
   std::array<std::function<void(_event_arg_t)>, events> _event_cb{};
@@ -61,21 +67,32 @@ template <std::integral T, size_t C, size_t R, size_t F, bool goal_hit_exact>
 void Game<T, C, R, F, goal_hit_exact>::roll() { 
   assert(!_won && "The game is already won, why would you still roll?!?!?");
 
-  const unsigned roll = _d.roll();
-  size_t new_pos = _pos + roll;
+  const unsigned roll = _d.roll(); 
+  _logger->trace("Game roll: {}", roll);
 
-  if (_event_cb[ROLL_EVENT]) 
+  size_t new_pos = _pos + roll;
+ 
+  // fire roll_event here
+  if (_event_cb[ROLL_EVENT])
+  {
+    _logger->trace("Game firing ROLL_EVENT");
     _event_cb[ROLL_EVENT](roll); 
+  }
 
   if (new_pos <= _board_max_pos)
   {
-    new_pos += _board[new_pos]; // jumps happen here 
-    if (_event_cb[SNAKE_LADDER_HIT_EVENT]) 
+    new_pos += _board[new_pos]; // jumps happen her
+
+    // fire SNAKE_LADDER_HIT_EVENT
+    if (_board[new_pos] && _event_cb[SNAKE_LADDER_HIT_EVENT])
+    {
+      _logger->trace("Game firing SNAKE_LADDER_HIT_EVENT");
       _event_cb[SNAKE_LADDER_HIT_EVENT](_board[new_pos]);
+    }
   }
 
   // overshoot is not a win if goal_hit_exact is true
-  if (_pos > new_pos)
+  if (new_pos > _board_max_pos)
   {
     if constexpr (goal_hit_exact)
       return; // rollback
@@ -85,14 +102,23 @@ void Game<T, C, R, F, goal_hit_exact>::roll() {
   }
   else if(new_pos == _board_max_pos)
      goto won;
-   
+  
+  // assign new position
   _pos = new_pos;
+  _logger->trace("Game pos: {}", _pos);
   return; 
 
 won:
   _won = true;
-  if (_event_cb[WON_EVENT]) 
+
+  // fire WON_EVENT
+  if (_event_cb[WON_EVENT])
+  {
+    _logger->trace("Game firing WON_EVENT");
     _event_cb[WON_EVENT]({});
+  }
+
+  _logger->debug("Game won");
 } 
 
 template <std::integral T, size_t C, size_t R, size_t F, bool goal_hit_exact>
