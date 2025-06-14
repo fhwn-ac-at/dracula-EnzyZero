@@ -2,7 +2,11 @@
 #include <spdlog/spdlog.h> 
 #include <argparse/argparse.hpp>
 #include <ctime>
+#include <ranges>
+#include <atomic>
 
+#include "statistics.h"
+#include "thread_cb.h"
 #include "../settings.h"  
 #include "snakes_ladders_board.h" 
 
@@ -28,7 +32,7 @@ int main(int argc, char* argv[]) {
   int runs{};
   int time{};
   int threads{};
-  int seed{ static_cast<int>(std::time(NULL)) };
+  int seed{ static_cast<int>(std::time(nullptr)) };
  
   // handle cli arguments using argsparser library
   { 
@@ -93,8 +97,84 @@ int main(int argc, char* argv[]) {
 
   spdlog::info("Seed used: {}", seed);
   spdlog::info("Starting the simulator. Running {} times on {} threads for {} milliseconds", runs, threads, time ? std::to_string(time) : "infinite"); 
+ 
+  /** 
+   * @brief Setting up the threads
+   *
+   * First, the keys will be extracted from the snakes_and_ladders list and passed to the factory.
+   * The factory is there to pre-insert keys into the map and reverve some stuff for the vectors to optimize a little
+   * and avoid rehashing.
+   *
+   * Then the threads will be created. They take a lot of parameters. First the number of runs required is split equally
+   * among the threads with a loop and they are called with their own statistics analyzer created from a factory.
+   * The threads promise to return Statistics structs, unless they are stopped by the timer.
+   */
+ 
+  // extract keys
+  auto keys = board::snakes_and_ladders.to_abs_positions()
+    | std::ranges::views::transform([](auto& pair) { return pair.first; })
+    | std::ranges::views::take_while([](const unsigned key) { return key != 0; });
 
-  //std::atomic_int at_runs = runs;
+  StatisticsCollectorFactory<unsigned, board::snakes_and_ladders.size()> factory(keys, optional::reserve);
+  std::atomic_int global_runs_left = runs; 
+ 
+  // vectors holding threads and their futures
+  std::vector<std::jthread> thread_vec;
+  std::vector<std::future<Statistics<unsigned>>> future_vec;
+  thread_vec.reserve(threads);
+  future_vec.reserve(threads);
 
+  for (int i = 1; i < threads; i++)
+  { 
+    // make a promise
+    std::promise<Statistics<unsigned>> promise;
+    future_vec.push_back( promise.get_future() );
+
+    thread_vec.emplace_back(
+       [&](std::stop_token st) mutable {
+         task<unsigned, board::cols, board::rows, dice::faces>(
+           st,
+           spdlog::default_logger(),
+           global_runs_left,
+           runs / threads,
+           seed + i,
+           dice::weights,
+           board,
+           factory.create_collector(),
+           std::move( promise )
+          );
+        }
+     );
+
+    // substract runs that are left to assign 
+    runs -= (runs / threads);
+} 
+
+  // finally make the last thread with the rest of the runs
+  {
+    std::promise<Statistics<unsigned>> promise;
+    future_vec.push_back( promise.get_future() );
+
+    thread_vec.emplace_back(
+      [&](std::stop_token st) mutable {
+        task<unsigned, board::cols, board::rows, dice::faces>(
+          st,
+          spdlog::default_logger(),
+          global_runs_left,
+          runs,
+          seed,
+          dice::weights,
+          board,
+          factory.create_collector(),
+          std::move( promise ) 
+        );
+      }
+    );
+  }
+
+  for (auto& thread : thread_vec)
+    thread.join();  
+     
+  
   // TODO signal handler?
 }
