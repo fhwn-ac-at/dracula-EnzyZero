@@ -62,7 +62,7 @@ void Game<T, C, R, F, goal_hit_exact>::roll() {
   assert(!_won && "The game is already won, why would you still roll?!?!?");
 
   const unsigned roll = _d.roll();
-  const size_t new_pos = _pos + roll;
+  size_t new_pos = _pos + roll;
 
   if (_event_cb[ROLL_EVENT]) 
     _event_cb[ROLL_EVENT](roll); 
@@ -92,7 +92,7 @@ void Game<T, C, R, F, goal_hit_exact>::roll() {
 won:
   _won = true;
   if (_event_cb[WON_EVENT]) 
-    _event_cb[WON_EVENT]();
+    _event_cb[WON_EVENT]({});
 } 
 
 template <std::integral T, size_t C, size_t R, size_t F, bool goal_hit_exact>
