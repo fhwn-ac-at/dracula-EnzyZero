@@ -32,7 +32,7 @@ public:
   constexpr auto to_abs_positions() const -> std::array<std::pair<T, T>, _Max>;
 
 private:
-  constexpr bool _check_vec(const vec<T>& vec) { return vec.x <= 0 || vec.x > C || vec.y <= 0 || vec.y > R; } 
+  constexpr bool _invalid_vec(const vec<T>& vec) { return vec.x <= 0 || vec.x > C || vec.y <= 0 || vec.y > R; } 
 
   bool _valid;
 }; 
@@ -51,7 +51,7 @@ constexpr list<T, C, R>::list(std::initializer_list<_vec_pair> list)
   }); 
 
   // zero out array if any of the vectors are out of bounds
-  if ( !std::ranges::all_of(_arr.begin(), _last_it, [this](const _vec_pair& pair) { return _check_vec(pair.first) && _check_vec(pair.second); } ))
+  if ( std::ranges::any_of(_arr.begin(), _last_it, [this](const _vec_pair& pair) { return _invalid_vec(pair.first) || _invalid_vec(pair.second); } ))
     std::ranges::fill(_arr, _vec_pair{});
   else
     _valid = true; 
