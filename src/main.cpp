@@ -122,21 +122,25 @@ int main(int argc, char* argv[]) {
   std::vector<std::jthread> thread_vec;
   std::vector<std::future<Statistics<unsigned>>> future_vec;
   thread_vec.reserve(threads);
-  future_vec.reserve(threads);
+  future_vec.reserve(threads); 
+ 
+  // calculate the runs per thread. save the runs left to runs again 
+  const unsigned per_thread_runs = runs / threads;
+  runs -= per_thread_runs * (threads - 1);
 
-  for (int i = 1; i < threads; i++)
+  for (int i = 0; i < threads; i++)
   { 
     // make a promise
     std::promise<Statistics<unsigned>> promise;
     future_vec.push_back( promise.get_future() );
 
     thread_vec.emplace_back(
-       [&](std::stop_token st) mutable {
+       [&, i](std::stop_token st) mutable {
          task<unsigned, board::cols, board::rows, dice::faces>(
            st,
            spdlog::default_logger(),
            global_runs_left,
-           runs / threads,
+           i ? per_thread_runs : runs, // the first thread gets the rest
            seed + i,
            dice::weights,
            board,
@@ -145,34 +149,9 @@ int main(int argc, char* argv[]) {
           );
         }
      );
+  } 
 
-    // substract runs that are left to assign 
-    runs -= (runs / threads);
-} 
-
-  // finally make the last thread with the rest of the runs
-  {
-    std::promise<Statistics<unsigned>> promise;
-    future_vec.push_back( promise.get_future() );
-
-    thread_vec.emplace_back(
-      [&](std::stop_token st) mutable {
-        task<unsigned, board::cols, board::rows, dice::faces>(
-          st,
-          spdlog::default_logger(),
-          global_runs_left,
-          runs,
-          seed,
-          dice::weights,
-          board,
-          factory.create_collector(),
-          std::move( promise ) 
-        );
-      }
-    );
-  }
-
-  for (auto& thread : thread_vec)
+    for (auto& thread : thread_vec)
     thread.join();  
      
   
