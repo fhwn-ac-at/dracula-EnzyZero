@@ -2,7 +2,6 @@
 #include <spdlog/spdlog.h> 
 #include <argparse/argparse.hpp>
 #include <ctime>
-#include <atomic>
 
 #include "../settings.h"  
 #include "snakes_ladders_board.h" 
@@ -12,12 +11,13 @@ int main(int argc, char* argv[]) {
   using namespace settings;
 
   // crate board and init weights at compile-18:27
-  const snakes_and_ladders::board<unsigned, board::cols, board::rows> board(board::snakes_and_ladders);
+  constexpr snakes_and_ladders::board<unsigned, board::cols, board::rows> 
+    board(board::snakes_and_ladders);
 
   spdlog::set_pattern("[%^%l%$] %v");
 
   // check for success
-  if (!board)
+  if constexpr (!board)
   {
     spdlog::error("BOARD::INIT::ERROR Board could not be created at compile-time, check your settings.h");
     return 1;
