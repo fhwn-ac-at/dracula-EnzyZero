@@ -27,14 +27,17 @@ void task(std::stop_token                  st, // supplied by jthread constructo
           std::promise<Statistics<T>>      promise
       )
 {
-  assert(board && assigned_runs >= 0 && "Board is invalid");
-  logger->info("Thread [{}]: running {} games with mixed_seed {}", gettid(), assigned_runs, mixed_seed);
+
+  assert(board && assigned_runs >= 0 && "Board is invalid"); 
+
+  const int thread_id = gettid();
+  logger->info("Thread [{}]: running {} games with mixed_seed {}", thread_id, assigned_runs, mixed_seed);
 
   using Dice = Dice<T, F>;
   using Game = Game<T, C, R, F>;
 
   Dice dice(weights_list, mixed_seed);
-  Game game(board, std::move(dice));
+  Game game(board, std::move(dice), logger);
    
   // add collector methods as
   game.add_event_handler(Game::ROLL_EVENT,             std::bind(&StatisticsCollector<T>::add_roll,             &collector, std::placeholders::_1));
@@ -43,17 +46,24 @@ void task(std::stop_token                  st, // supplied by jthread constructo
  
   // the game-loop
   for(int runs = 0; runs < assigned_runs && !st.stop_requested(); runs++, global_runs_count--) 
-  { 
+  {
+    logger->trace("Thread [{}]: outer loop index {}", thread_id, runs);
+
     // inner game loop for steps in a game
     while (!st.stop_requested() && !game.won())
       game.roll();
-    
+
+    logger->trace("Thread [{}]: game finished, resetting game", thread_id);
     game.reset();
   }
 
   if (!st.stop_requested())
+  {
+    logger->info("Thread [{}] stopped", thread_id);
     return;
+  }
 
+  logger->debug("Thread [{}] finished", thread_id);
   promise.set_value(collector.get_results());
 }
 
