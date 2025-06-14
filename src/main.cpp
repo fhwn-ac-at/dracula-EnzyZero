@@ -1,9 +1,11 @@
-#include <fmt/core.h> 
+#include <fmt/core.h>
+#include <fmt/ranges.h>
 #include <spdlog/spdlog.h> 
 #include <argparse/argparse.hpp>
 #include <ctime>
 #include <ranges>
 #include <atomic>
+#include <chrono>
 
 #include "statistics.h"
 #include "thread_cb.h"
@@ -12,11 +14,11 @@
 
 int main(int argc, char* argv[]) {  
 
-  using namespace settings;
+  using namespace settings;  
 
-  // crate board and init weights at compile-18:27
+  // create board and init weights at compile-time
   constexpr snakes_and_ladders::board<unsigned, board::cols, board::rows> 
-    board(board::snakes_and_ladders);
+    board(board::snakes_and_ladders); 
 
   spdlog::set_pattern("[%^%l%$] %v");
 
@@ -29,7 +31,7 @@ int main(int argc, char* argv[]) {
   else
     spdlog::info("BOARD::INIT::SUCCESSFUL Board was loaded successfully at compile-time\n"); 
 
-  int runs{};
+  size_t runs{};
   int time{};
   int threads{};
   int seed{ static_cast<int>(std::time(nullptr)) };
@@ -97,7 +99,10 @@ int main(int argc, char* argv[]) {
 
   spdlog::info("Seed used: {}", seed);
   spdlog::info("Starting the simulator. Running {} times on {} threads for {} milliseconds", runs, threads, time ? std::to_string(time) : "infinite"); 
- 
+  
+  // mark end time
+  const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(time);
+
   /** 
    * @brief Setting up the threads
    *
@@ -116,13 +121,14 @@ int main(int argc, char* argv[]) {
     | std::ranges::views::take_while([](const unsigned key) { return key != 0; });
 
   StatisticsCollectorFactory<unsigned, board::snakes_and_ladders.size()> factory(keys, optional::reserve);
-  std::atomic_int global_runs_left = runs; 
- 
+  std::atomic_size_t global_runs_left = runs;
+  std::atomic_int threads_started = 0;
+
   // vectors holding threads and their futures
   std::vector<std::jthread> thread_vec;
   std::vector<std::future<Statistics<unsigned>>> future_vec;
   thread_vec.reserve(threads);
-  future_vec.reserve(threads); 
+  future_vec.reserve(threads);
  
   // calculate the runs per thread. save the runs left to runs again 
   const unsigned per_thread_runs = runs / threads;
@@ -135,25 +141,73 @@ int main(int argc, char* argv[]) {
     future_vec.push_back( promise.get_future() );
 
     thread_vec.emplace_back(
-       [&, i](std::stop_token st) mutable {
-         task<unsigned, board::cols, board::rows, dice::faces>(
-           st,
-           spdlog::default_logger(),
-           global_runs_left,
-           i ? per_thread_runs : runs, // the first thread gets the rest
-           seed + i,
-           dice::weights,
-           board,
-           factory.create_collector(),
-           std::move( promise )
-          );
+      [ &, i, promise = std::move(promise)] (std::stop_token st) mutable { 
+
+        threads_started++;
+
+        task<unsigned, board::cols, board::rows, dice::faces>(
+          st,
+          spdlog::default_logger(),
+          global_runs_left,
+          i ? per_thread_runs : runs, // the first thread gets the rest
+          seed + i,
+          dice::weights,
+          board,
+          factory.create_collector(),
+          std::move( promise )
+        );
         }
      );
   } 
 
-    for (auto& thread : thread_vec)
-    thread.join();  
-     
-  
-  // TODO signal handler?
+  // wait for all threads to have started 
+  while (threads_started.load() < threads)
+    std::this_thread::sleep_for( std::chrono::milliseconds(10) );
+   
+  {
+    fmt::print("\033[?25l\n"); // hide cursor
+
+    // report runs left util either deadline reached or all runs finished
+    while (std::chrono::steady_clock::now() < deadline && global_runs_left.load() > 0)
+      fmt::print("[{}RUNS::LEFT{}]: {}\r", "\033[34m", "\033[0m", global_runs_left.load());
+
+    fmt::print("\033[?25h\n"); // show cursor
+  } 
+
+  if (std::chrono::steady_clock::now() > deadline)
+    spdlog::warn("TIMER::EXPIRED");
+ 
+  /** 
+   * @brief collect the results
+   *
+   * A vector will hold all the Statistics objects.
+   * A StatisticsCollector will be constructed with the vector and will sum all the results of each vector into
+   * another Statistics obj whose members will be printed to stdout.
+   */
+  std::vector<Statistics<unsigned>> results;
+  results.reserve(future_vec.size());
+ 
+  for (auto& future : future_vec) 
+  {  
+    try {
+       results.emplace_back( future.get() );
+
+    } catch (std::exception& err) {
+      spdlog::error("BROKEN::PROMISE::ERROR: {}", err.what());
+      return 1;
+    }
+  }
+ 
+  spdlog::info("Results are ready (this may take some time):\n");
+  StatisticsCollector<unsigned> final_collect(results);
+  Statistics result = final_collect.get_results(); 
+
+  fmt::println("      AVERAGE_ROLLS: {} rolls to win a game on average", result.avrg_rolls);
+  fmt::println("  SHORTEST_ROLL_SEQ: {}", result.shortest_game_rolls);
+  fmt::println("SNAKES_LADDERS_HITS: size: {}", result.snakes_ladders_hits.size());
+
+  // print all the pairs
+  fmt::println("dest | hits");
+  for (const auto& pair : result.snakes_ladders_hits)
+    fmt::println("{:^5}|{:^5}", pair.first, pair.second);
 }
