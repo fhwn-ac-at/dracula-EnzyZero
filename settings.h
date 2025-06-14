@@ -1,9 +1,7 @@
 #ifndef settings_h 
 #define settings_h 
 
-#include "dice.h"
 #include "snakes_ladders_list.h"
-#include <initializer_list>
 
 namespace settings { 
 
@@ -26,7 +24,7 @@ namespace board
   
   constexpr unsigned cols = 10;
   constexpr unsigned rows = 10; 
- 
+  
   constexpr snakes_and_ladders::list<unsigned, cols, rows>
     snakes_and_ladders = {
         
@@ -51,7 +49,16 @@ namespace board
 namespace dice 
 {
   constexpr unsigned faces = 6; 
-  constexpr std::array<unsigned, faces> weights = {};
+  constexpr std::array<double, faces> weights = {};
+}
+
+
+/* The settings below change how much vectors reserve. Higher numbers may improve performance,
+ * at the cost of more and longer allocations.
+ */
+namespace optional {
+
+  constexpr size_t reserve = 100;
 }
 
 } // settings namespace 
