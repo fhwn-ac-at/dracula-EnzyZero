@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
    */
  
   // extract keys
-  auto keys = board::snakes_and_ladders.to_abs_positions()
+  auto keys = board::snakes_and_ladders.to_absolute()
     | std::ranges::views::transform([](auto& pair) { return pair.first; })
     | std::ranges::views::take_while([](const unsigned key) { return key != 0; });
 

@@ -31,10 +31,8 @@ constexpr board<T, C, R>::board(const snakes_and_ladders::list<T, C, R>& list)
     // (big memory usage, but O(1) access, and I dont wanna use unordered_map)
     std::array<T, C * R> used_dest{}; 
 
-    auto is_not_empty_pair = [](const auto& pair) { return pair.first != 0 || pair.second != 0; };
- 
     // convert list to absolute positions and take until empty found
-    for(const auto [ abs_origin, abs_dest ] : list.to_abs_positions() | std::ranges::views::take_while(is_not_empty_pair)) 
+    for(const auto [ abs_origin, abs_dest ] : list.to_absolute() ) 
     { 
       // check for false snakes or ladder placement
       if (_base::_arr[abs_origin] != 0 || 

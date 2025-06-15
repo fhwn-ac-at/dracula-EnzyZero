@@ -32,7 +32,7 @@ namespace board
       { {1, 1},   { 10, 10} }, 
 
     };
-}  
+}   
 
 /** 
  * @brief specify the faces and the weights (optional) of each of them 
