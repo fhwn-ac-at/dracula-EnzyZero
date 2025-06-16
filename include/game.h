@@ -6,24 +6,15 @@
 #include <spdlog/sinks/null_sink.h>
 
 #include "dice.h"
-#include "event_base.h"
 #include "board_base.h"
+#include "game_event.h"
 
 template <std::integral T, size_t C, size_t R, size_t F, bool goal_hit_exact = false> 
 class Game {
 public: 
-
-  static constexpr size_t E = 4; 
-  enum events : int {
-
-    ROLL_EVENT,             // unsigned
-    SNAKE_LADDER_HIT_EVENT, // size_t 
-    WON_EVENT,              // monostate void
-    POS_EVENT               // size_t
-  }; 
- 
-  event_base<E, unsigned, size_t, std::monostate>
-  event;
+  
+  GameEvent event;
+  using enum GameEvent::events;
 
   Game(
     const board_base<T, C, R>& board, 
@@ -65,13 +56,13 @@ void Game<T, C, R, F, goal_hit_exact>::roll() {
   assert(!_won && "The game is already won, why would you still roll?!?!?");
  
   // roll but do not overwrite current pos
-  const unsigned roll = _d.roll(); 
+  const size_t roll = _d.roll(); 
   size_t new_pos = _pos + roll; 
   _logger->trace("Game roll: {}", roll);
   event.publish(ROLL_EVENT, roll);
 
   // jumps happen here
-  if (const unsigned jump = _board[new_pos]; new_pos <= _board_max_pos && jump != 0)
+  if (const size_t jump = _board[new_pos]; new_pos <= _board_max_pos && jump != 0)
   {
     new_pos += jump; 
     event.publish(SNAKE_LADDER_HIT_EVENT, jump);
@@ -99,7 +90,7 @@ won:
   _won = true;
 
   // fire WON_EVENT
-  event.publish(WON_EVENT, {});
+  event.publish(WON_EVENT, 0ul);
   _logger->debug("Game won");
 } 
 

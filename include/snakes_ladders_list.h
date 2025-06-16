@@ -23,21 +23,21 @@ class list {
 public:
 
   constexpr list(std::initializer_list<_vec_pair> inlist)
-  : list( std::views::all(inlist) )
+  : list( std::ranges::ref_view(inlist) )
   {}
 
   constexpr list(std::initializer_list<std::pair<T, T>> inlist)
-  : list( std::views::all(inlist) )
+  : list( std::ranges::ref_view(inlist) )
   {}
 
   // construct from cartesian coordinates
   template <std::ranges::input_range _R>
-  requires std::same_as<_R, std::pair<vec<T>, vec<T>>>
+  requires std::same_as<std::ranges::range_value_t<_R>, std::pair<vec<T>, vec<T>>>
   constexpr list(_R&& r);
  
   // construct from absolute position-pairs
   template <std::ranges::input_range _R>
-  requires std::same_as<_R, std::pair<T, T>>
+  requires std::same_as<std::ranges::range_value_t<_R>, std::pair<T, T>>
   constexpr list(_R&& r);
 
   constexpr operator bool() const { return _valid; }
@@ -53,7 +53,7 @@ private:
 
 template <std::integral T, size_t C, size_t R>
 template <std::ranges::input_range _R>
-requires std::same_as<_R, std::pair<T, T>>
+requires std::same_as<std::ranges::range_value_t<_R>, std::pair<T, T>>
 constexpr list<T, C, R>::list(_R&& r)
 {
   // reconstruate the cartesian coordinates
@@ -78,20 +78,19 @@ constexpr list<T, C, R>::list(_R&& r)
 
 template <std::integral T, size_t C, size_t R>
 template <std::ranges::input_range _R>
-requires std::same_as<_R, std::pair<vec<T>, vec<T>>>
+requires std::same_as<std::ranges::range_value_t<_R>, std::pair<vec<T>, vec<T>>>
 constexpr list<T, C, R>::list(_R&& r)
 : _arr{},
   _valid( false )
 { 
   auto _invalid_vec = [](const vec<T>& vec) { return vec.x <= 0 || vec.x > C || vec.y <= 0 || vec.y > R; };
 
-  // find the last position with a snake or ladder (i.e. both vectors are null)
+  // take a view until the last position with a snake or ladder (i.e. both vectors are null)
   // then check that none of the vectors until there are invalid 
-  _valid = r
-    | std::views::take_while([](const _vec_pair& pair) 
-      { return !pair.first.is_null() && !pair.second.is_null(); }
-    )
-    | std::ranges::none_of([this](const _vec_pair& pair) 
+  _valid =  std::ranges::none_of(
+    r | std::views::take_while([](const _vec_pair& pair) 
+      { return !pair.first.is_null() && !pair.second.is_null(); }),
+    [&_invalid_vec](const _vec_pair& pair) 
       { return _invalid_vec(pair.first) || _invalid_vec(pair.second); }
   );
 

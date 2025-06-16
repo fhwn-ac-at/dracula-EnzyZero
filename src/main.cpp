@@ -17,19 +17,19 @@ int main(int argc, char* argv[]) {
   using namespace settings;  
 
   // create board and init weights at compile-time
-  constexpr snakes_and_ladders::board<unsigned, board::cols, board::rows> 
+  snakes_and_ladders::board<unsigned, board::cols, board::rows> 
     board(board::snakes_and_ladders); 
 
   spdlog::set_pattern("[%^%l%$] %v");
 
   // check for success
-  if constexpr (!board)
+  if (!board)
   {
-    spdlog::error("BOARD::INIT::ERROR Board could not be created at compile-time, check your settings.h");
+    spdlog::error("BOARD::INIT::ERROR Board could not be created, check your settings.h");
     return 1;
   }
   else
-    spdlog::info("BOARD::INIT::SUCCESSFUL Board was loaded successfully at compile-time\n"); 
+    spdlog::info("BOARD::INIT::SUCCESSFUL Board was loaded successfully"); 
 
   size_t runs{};
   int time{};
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
       spdlog::warn("NO::ARGS::GIVEN no arguments passed, exiting");
       return 0;
     }
-  
+
     // parsing happens here
     try 
     { 
@@ -100,8 +100,10 @@ int main(int argc, char* argv[]) {
   spdlog::info("Seed used: {}", seed);
   spdlog::info("Starting the simulator. Running {} times on {} threads for {} milliseconds", runs, threads, time ? std::to_string(time) : "infinite"); 
   
-  // mark end time
-  const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(time);
+  // mark end time, init deadline checker
+  const auto deadline = time > 0 
+    ? std::chrono::steady_clock::now() + std::chrono::milliseconds(time)
+    : std::chrono::steady_clock::time_point::max();
 
   /** 
    * @brief Setting up the threads
@@ -115,68 +117,71 @@ int main(int argc, char* argv[]) {
    * The threads promise to return Statistics structs, unless they are stopped by the timer.
    */
  
-  // extract keys
-  auto keys = board::snakes_and_ladders.to_absolute()
-    | std::ranges::views::transform([](auto& pair) { return pair.first; })
-    | std::ranges::views::take_while([](const unsigned key) { return key != 0; });
-
-  StatisticsCollectorFactory<unsigned, board::snakes_and_ladders.size()> factory(keys, optional::reserve);
-  std::atomic_size_t global_runs_left = runs;
-  std::atomic_int threads_started = 0;
-
-  // vectors holding threads and their futures
-  std::vector<std::jthread> thread_vec;
-  std::vector<std::future<Statistics<unsigned>>> future_vec;
-  thread_vec.reserve(threads);
+  // vector for the returns of the threads
+  std::vector<std::future<Statistics>> future_vec;
   future_vec.reserve(threads);
- 
-  // calculate the runs per thread. save the runs left to runs again 
-  const unsigned per_thread_runs = runs / threads;
-  runs -= per_thread_runs * (threads - 1);
 
-  for (int i = 0; i < threads; i++)
-  { 
-    // make a promise
-    std::promise<Statistics<unsigned>> promise;
-    future_vec.push_back( promise.get_future() );
-
-    thread_vec.emplace_back(
-      [ &, i, promise = std::move(promise)] (std::stop_token st) mutable { 
-
-        threads_started++;
-
-        task<unsigned, board::cols, board::rows, dice::faces>(
-          st,
-          spdlog::default_logger(),
-          global_runs_left,
-          i ? per_thread_runs : runs, // the first thread gets the rest
-          seed + i,
-          dice::weights,
-          board,
-          factory.create_collector(),
-          std::move( promise )
-        );
-        }
-     );
-  } 
-
-  // wait for all threads to have started 
-  while (threads_started.load() < threads)
-    std::this_thread::sleep_for( std::chrono::milliseconds(10) );
-   
+  // threads will be stopped as soon as the vector leaves this scope
   {
-    fmt::print("\033[?25l\n"); // hide cursor
+    // extract keys
+    auto keys = std::views::keys(board::snakes_and_ladders.to_absolute());
 
+    StatisticsCollectorFactory<board::snakes_and_ladders.size()> factory(keys, optional::reserve);
+    std::atomic_size_t global_runs_left = runs;
+    std::atomic_int threads_started = 0;
+
+    std::vector<std::jthread> thread_vec;
+    thread_vec.reserve(threads);
+
+    // calculate the runs per thread. save the runs left to runs again 
+    const unsigned per_thread_runs = runs / threads;
+    runs -= per_thread_runs * (threads - 1);
+
+    for (int i = 0; i < threads; i++)
+    { 
+      // make a promise
+      std::promise<Statistics> promise;
+      future_vec.push_back( promise.get_future() );
+
+      thread_vec.emplace_back(
+        [ &, i, promise = std::move(promise)] (std::stop_token st) mutable { 
+
+          spdlog::info("Thread [{}]: running {} games with mixed_seed {}", gettid(), i ? per_thread_runs : runs, seed + i);   
+          threads_started++;
+
+          task<unsigned, board::cols, board::rows, dice::faces>(
+            st,
+            spdlog::default_logger(),
+            global_runs_left,
+            i ? per_thread_runs : runs, // the first thread gets the rest
+            seed + i,
+            dice::weights,
+            board,
+            factory.create_collector(),
+            std::move( promise )
+          );
+        } // lambda
+      ); // emplace back
+    } // for
+
+    // wait for all threads to have started 
+    while (threads_started.load() < threads)
+      std::this_thread::sleep_for( std::chrono::milliseconds(10) );
+
+
+    fmt::print("\033[?25l\n"); // hide cursor
+ 
     // report runs left util either deadline reached or all runs finished
-    while (std::chrono::steady_clock::now() < deadline && global_runs_left.load() > 0)
+    while ( std::chrono::steady_clock::now() < deadline && global_runs_left.load() > 0)
       fmt::print("[{}RUNS::LEFT{}]: {}\r", "\033[34m", "\033[0m", global_runs_left.load());
 
     fmt::print("\033[?25h\n"); // show cursor
-  } 
 
-  if (std::chrono::steady_clock::now() > deadline)
-    spdlog::warn("TIMER::EXPIRED");
- 
+    if ( std::chrono::steady_clock::now() >= deadline )
+      spdlog::warn("TIMER::EXPIRED");
+
+  } // threads get stopped and deleted here - end of scope
+
   /** 
    * @brief collect the results
    *
@@ -184,7 +189,7 @@ int main(int argc, char* argv[]) {
    * A StatisticsCollector will be constructed with the vector and will sum all the results of each vector into
    * another Statistics obj whose members will be printed to stdout.
    */
-  std::vector<Statistics<unsigned>> results;
+  std::vector<Statistics> results;
   results.reserve(future_vec.size());
  
   for (auto& future : future_vec) 
@@ -198,16 +203,14 @@ int main(int argc, char* argv[]) {
     }
   }
  
-  spdlog::info("Results are ready (this may take some time):\n");
-  StatisticsCollector<unsigned> final_collect(results);
+  StatisticsCollector final_collect(results);
   Statistics result = final_collect.get_results(); 
 
   fmt::println("      AVERAGE_ROLLS: {} rolls to win a game on average", result.avrg_rolls);
   fmt::println("  SHORTEST_ROLL_SEQ: {}", result.shortest_game_rolls);
-  fmt::println("SNAKES_LADDERS_HITS: size: {}", result.snakes_ladders_hits.size());
+  fmt::println("SNAKES_LADDERS_HITS: dest  |  hits ", result.snakes_ladders_hits.size());
 
   // print all the pairs
-  fmt::println("dest | hits");
   for (const auto& pair : result.snakes_ladders_hits)
-    fmt::println("{:^5}|{:^5}", pair.first, pair.second);
+    fmt::println("                    {:^7}|{:^7}", pair.first, pair.second);
 }

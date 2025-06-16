@@ -1,7 +1,6 @@
 #ifndef statistics_collector_h
 #define statistics_collector_h
 
-#include <cwchar>
 #include <iterator>
 #include <vector>
 #include <unordered_map>
@@ -11,24 +10,22 @@
 #include <ranges>
 #include <concepts>
 
-template <std::integral T>
 struct Statistics {
 
   double avrg_rolls;
-  std::vector<T> shortest_game_rolls; 
+  std::vector<unsigned> shortest_game_rolls; 
   std::unordered_map<size_t, unsigned> snakes_ladders_hits;
  
-  std::strong_ordering operator<=>(const Statistics<T>& other) { return shortest_game_rolls.size() <=> other.shortest_game_rolls.size(); }
+  std::strong_ordering operator<=>(const Statistics& other) { return shortest_game_rolls.size() <=> other.shortest_game_rolls.size(); }
 }; 
 
-template <std::integral T>
 class StatisticsCollector {
 public: 
 
   StatisticsCollector() = default;
  
   template <std::ranges::input_range R>
-  requires std::same_as<Statistics<T>, std::ranges::range_value_t<R>>
+  requires std::same_as<Statistics, std::ranges::range_value_t<R>>
   StatisticsCollector(R&& statistics)
   {
     // insert all the avrg of the Statistics into _all_game_roll_counts
@@ -44,15 +41,15 @@ public:
     // add all the snakes and ladders hits into this map
     for(const auto& stat : statistics)
     {
-      const auto& map = stat.snakes_ladders_hits;
-      for (const auto& pair: map)
+      const auto& other_map = stat.snakes_ladders_hits;
+      for (const auto& pair: other_map)
       {
-        _snake_ladder_hit_map.insert(pair);
+        _snake_ladder_hit_map[pair.first] += pair.second;
       }
     }
   }
 
-  void add_roll(const T roll) { _current_game_roll_seq.push_back(roll); }
+  void add_roll(const unsigned roll) { _current_game_roll_seq.push_back(roll); }
 
   void add_snake_ladder_hit(const size_t hit) { _snake_ladder_hit_map[hit]++; }
 
@@ -69,7 +66,7 @@ public:
     _current_game_roll_seq.clear();
   }
 
-  [[nodiscard]] Statistics<T> get_results() {
+  [[nodiscard]] Statistics get_results() {
     
     return {
       .avrg_rolls = std::accumulate(_all_game_roll_counts.begin(), _all_game_roll_counts.end(), 0) / static_cast<double>( _all_game_roll_counts.size() ),
@@ -80,18 +77,20 @@ public:
 
 
 private:
-  std::vector<T> _current_game_roll_seq;
-  std::vector<T> _shortest_game_roll_seq;
-  std::vector<T> _all_game_roll_counts;
+  std::vector<unsigned> _current_game_roll_seq;
+  std::vector<unsigned> _shortest_game_roll_seq;
+
+  // will also be used to hold the average counts of multiple games
+  std::vector<double> _all_game_roll_counts; 
 
   std::unordered_map<size_t /* snake/ladder pos */, unsigned /* hit count */>
     _snake_ladder_hit_map;
  
-  template <std::integral _T, size_t K>
+  template <size_t K>
   friend class StatisticsCollectorFactory;
 }; 
 
-template <std::integral T, size_t K>
+template <size_t K>
 class StatisticsCollectorFactory { 
 public:
   
@@ -111,9 +110,9 @@ public:
     }
   }
 
-  StatisticsCollector<T> create_collector() const {
+  StatisticsCollector create_collector() const {
     
-    StatisticsCollector<T> ret;
+    StatisticsCollector ret;
     ret._all_game_roll_counts.reserve(_reserve);
     ret._shortest_game_roll_seq.reserve(_reserve);
     ret._current_game_roll_seq.reserve(_reserve);
@@ -121,10 +120,10 @@ public:
     return ret;
   }
 
-  StatisticsCollector<T> operator()() const { return create_collector(); }
+  StatisticsCollector operator()() const { return create_collector(); }
 
 private:
-  std::array<std::pair<T, T>, K> _keys_zerovalues; // map expects pairs to be inserted
+  std::array<std::pair<unsigned, unsigned>, K> _keys_zerovalues; // map expects pairs to be inserted
   const size_t _reserve;
 };
 

@@ -22,14 +22,16 @@ namespace board
 {  
   constexpr bool goal_hit_exact = true;
   
-  constexpr unsigned cols = 10;
-  constexpr unsigned rows = 10; 
+  constexpr unsigned cols = 3;
+  constexpr unsigned rows = 3; 
   
-  constexpr snakes_and_ladders::list<unsigned, cols, rows>
+  inline snakes_and_ladders::list<unsigned, cols, rows>
     snakes_and_ladders = {
-        
+
    /* origin xy |  dest xy     */
-      { {1, 1},   { 10, 10} }, 
+      { {1, 1},   { 3, 3} },
+      { {2, 1},   { 2, 3} },
+      { {3, 1},   { 1, 3} },
 
     };
 }   

@@ -14,24 +14,21 @@
 #include "dice.h"
 #include "game.h"
 
-template <typename T, unsigned C, unsigned R, unsigned F, std::ranges::input_range r>
+template <typename T, unsigned C, unsigned R, unsigned F, std::ranges::input_range _R>
 void task(std::stop_token                  st, // supplied by jthread constructor
           std::shared_ptr<spdlog::logger>  logger,
           std::atomic_size_t&              global_runs_count,
           const int                        assigned_runs, 
           const size_t                     mixed_seed,
-          r&&                              weights_list,
+          _R&&                             weights_list,
           const board_base<T, C, R>&       board,
 
-          StatisticsCollector<T>           collector,
-          std::promise<Statistics<T>>      promise
+          StatisticsCollector              collector,
+          std::promise<Statistics>         promise
       )
 {
-
   assert(board && assigned_runs >= 0 && "Board is invalid");
-
   const int thread_id = gettid();
-  logger->info("Thread [{}]: running {} games with mixed_seed {}", thread_id, assigned_runs, mixed_seed);
 
   using Dice = Dice<T, F>;
   using Game = Game<T, C, R, F>;
@@ -40,9 +37,9 @@ void task(std::stop_token                  st, // supplied by jthread constructo
   Game game(board, std::move(dice), logger);
    
   // add collector methods as
-  game.add_event_handler(Game::ROLL_EVENT,             std::bind(&StatisticsCollector<T>::add_roll,             &collector, std::placeholders::_1));
-  game.add_event_handler(Game::SNAKE_LADDER_HIT_EVENT, std::bind(&StatisticsCollector<T>::add_snake_ladder_hit, &collector, std::placeholders::_1));
-  game.add_event_handler(Game::WON_EVENT,              std::bind(&StatisticsCollector<T>::finalize,             &collector)); 
+  game.event.subscribe(Game::ROLL_EVENT,             [&collector](const size_t r) { collector.add_roll(r); });
+  game.event.subscribe(Game::SNAKE_LADDER_HIT_EVENT, [&collector](const size_t h) { collector.add_snake_ladder_hit(h); });
+  game.event.subscribe(Game::WON_EVENT,              [&collector]([[maybe_unused]] const size_t n) {collector.finalize(); });
  
   // the game-loop
   for(int runs = 0; runs < assigned_runs && !st.stop_requested(); runs++, global_runs_count--) 
